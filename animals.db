@@ -1,0 +1,6 @@
+name[string(20)], kind[string(8)], age[int], key
+"Joe", "cat", 4
+"Spot", "dog", 10
+"Snoopy, "bird", 3
+"Tweety", "bird", 1
+"Joe", "bird", 2
