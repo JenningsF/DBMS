@@ -50,12 +50,17 @@ void DBengine::select() {
 
 // Quintin's function
 void DBengine::create(string fileName, vector<attributes> attrVect, vector<string> primaryKey) {
-	// ofstream outfile (fileName);
-	// outfile << fileName;
-	// outfile.close();
+	/*Open an output stream for a new .db file*/
+	ofstream outfile (filename);
+	/*Writes first line of file with attribute information*/
+	for (int i = 0; i < attrVect.size(); ++i) {
+		outfile << attrVect[i].attrName << '|' << attrVect[i].type << '|' << attrVect[i].attributeSize << " ";
+	}
+	/*Saves the file*/
+	outfile.close();
 }
 
-// Jennings' function
+// Quintin's function
 void DBengine::insert(string tableName) {
 
 }
@@ -65,6 +70,7 @@ void DBengine::del() {
 
 }
 
+// Jennings' function
 void DBengine::update() {
 
 }

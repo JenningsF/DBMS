@@ -26,7 +26,7 @@ void exit();
 void write();
 void show();
 void select();
-void create(string filename);
+void create(string fileName, vector<attributes> attrVect, vector<string> primaryKey);
 void insert();
 void del();
 void update();
