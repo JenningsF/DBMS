@@ -7,42 +7,26 @@
 // Description	: Database Engine where functions will be declared
 //********************************************************
 
-void open() {
+#include <iostream>
+#include <fstream>
+#include <string>
 
-}
+using namespace std;
 
-void close() {
+struct attribute {
+	string attributeName;
+	string type;
+	int attributeSize;
+	bool isPk;
+};
 
-}
-
-void exit() {
-
-}
-
-void write() {
-
-}
-
-void show() {
-
-}
-
-void select() {
-
-}
-
-void create() {
-
-}
-
-void insert() {
-
-}
-
-void del() {
-
-}
-
-void update() {
-
-}
+bool open();
+bool close();
+void exit();
+void write();
+void show();
+void select();
+void create(string filename);
+void insert();
+void del();
+void update();
