@@ -20,8 +20,8 @@ struct attribute {
 	bool isPk;
 };
 
-bool open();
-bool close();
+bool open(string fileName);
+bool close(string fileName);
 void exit();
 void write();
 void show();
