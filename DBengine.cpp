@@ -55,7 +55,7 @@ void DBengine::create(string fileName, vector<attributes> attrVect, vector<strin
 	// outfile.close();
 }
 
-// Jennings' function
+// Quintin's function
 void DBengine::insert(string tableName) {
 
 }
@@ -65,6 +65,7 @@ void DBengine::del() {
 
 }
 
+// Jennings' function
 void DBengine::update() {
 
 }
