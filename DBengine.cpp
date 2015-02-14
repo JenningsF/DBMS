@@ -37,12 +37,35 @@ void DBengine::exit() {
 }
 
 // Gokul's function
-void DBengine::write() {
+void DBengine::write(string fileName, vector<attribute> attrVect, vector<string> primaryKey) {
+	
+	ofstream outfile;
+	if(!ifstream(fileName){ //if the file does not exist
+		create(fileName, attrVect, primaryKey); //create the .db file
+	}
+	outfile.open(fileName); 
+
+	if (outfile.is_open()){ 
+		for (int i = 0; i < attrVect.size(); ++i) {
+			outfile << attrVect[i].attributeName << '|' << attrVect[i].type << '|' << attrVect[i].attributeSize << " ";
+		}
+	}
+	outfile.close();
+}
 
 }
 
 // Gokul's function
-void DBengine::show(string fileName) {
+void DBengine::show(string fileName) { //prints contents of a file to screen
+
+	ifstream infile(fileName);
+	if(infile.fail()){
+		cout << "File failed to open\n";
+		exit(1);
+	}
+	
+	cout << infile.rdbuf();
+	infile.close();
 
 }
 
@@ -58,7 +81,7 @@ void DBengine::create(string fileName, vector<attribute> attrVect, vector<string
 	/*Writes first line of file with attribute information*/
 	if (outfile.is_open()){
 		for (int i = 0; i < attrVect.size(); ++i) {
-			outfile << attrVect[i].attrName << '|' << attrVect[i].type << '|' << attrVect[i].attributeSize << " ";
+			outfile << attrVect[i].attributeName << '|' << attrVect[i].type << '|' << attrVect[i].attributeSize << " ";
 		}
 	}
 	/*Saves the file*/
@@ -80,10 +103,10 @@ void DBengine::insert(string tableName, attribute newAttr) {
 		}
 	}
 	in.close();
-	string newColumnList = newAttr.attrName + '|' + newAttr.type + '|';
-	newColumnList=newColumnList + newAttr.attributeSize + " " + fileHolder[0];
+	string newColumnList = newAttr.attrributeName + '|' + newAttr.type + '|';
+	newColumnList=newColumnList + char(newAttr.attributeSize) + " " + fileHolder[0];
 	fileHolder[0] = newColumnList;
-	ofstream outfile (tableName)
+	ofstream outfile (tableName);
 	if (outfile.is_open()){
 		for (int i = 0; i < fileHolder.size(); ++i){
 			outfile << fileHolder[i] << endl;

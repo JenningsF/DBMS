@@ -27,8 +27,8 @@ struct attribute {
 bool open(string fileName);
 bool close(string fileName);
 void exit();
-void write();
-void show();
+void write(string fileName, vector<attribute> attrVect, vector<string> primaryKey);
+void show(fileName);
 void select();
 void create(string fileName, vector<attributes> attrVect, vector<string> primaryKey);
 void insert(string tableName, attribute newAttr);
