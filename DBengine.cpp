@@ -47,7 +47,7 @@ void DBengine::exit() {
 
 // Gokul's function
 void DBengine::write(string fileName, vector<attribute> attrVect, vector<string> primaryKey) {
-
+	/*
 	ofstream outfile;
 	if (!ifstream(fileName)) { //if the file does not exist
 		create(fileName, attrVect, primaryKey); //create the .db file
@@ -60,13 +60,14 @@ void DBengine::write(string fileName, vector<attribute> attrVect, vector<string>
 		}
 	}
 	outfile.close();
+	*/
 }
 
 
 
 // Gokul's function
 void DBengine::show(string fileName) { //prints contents of a file to screen
-
+	/*
 	ifstream infile(fileName);
 	if (infile.fail()){
 		cout << "File failed to open\n";
@@ -75,7 +76,7 @@ void DBengine::show(string fileName) { //prints contents of a file to screen
 
 	cout << infile.rdbuf();
 	infile.close();
-
+	*/
 }
 
 // Cody's function
@@ -94,7 +95,7 @@ void DBengine::output() {
 // Quintin's function
 void DBengine::create(string fileName, vector<attribute> attrVect, vector<string> primaryKey) {
 	/*Open an output stream for a new .db file*/
-	ofstream outfile(fileName);
+	ofstream outfile(fileName.c_str());
 	/*Writes first line of file with attribute information*/
 	if (outfile.is_open()){
 		for (int i = 0; i < attrVect.size(); ++i) {
@@ -111,7 +112,7 @@ Input:	Table Name (string)
 New Attribute (attribute)
 */
 void DBengine::insert(string tableName, attribute newAttr) {
-	ifstream in(tableName);
+	ifstream in(tableName.c_str());
 	vector<string> fileHolder;
 	string line;
 	if (in.is_open()){
@@ -123,7 +124,7 @@ void DBengine::insert(string tableName, attribute newAttr) {
 	string newColumnList = newAttr.attributeName + '|' + newAttr.attributeType + '|';
 	newColumnList = newColumnList + char(newAttr.attributeSize) + " " + fileHolder[0];
 	fileHolder[0] = newColumnList;
-	ofstream outfile(tableName);
+	ofstream outfile(tableName.c_str());
 	if (outfile.is_open()){
 		for (int i = 0; i < fileHolder.size(); ++i){
 			outfile << fileHolder[i] << endl;
@@ -172,6 +173,30 @@ ostream& operator<<(ostream& out, Relation& table) {
 	return out;
 }
 
+// Relation Function Definitions
+Row Relation::getRow(int i) { 
+	if (i < size)
+		return rows[i];
+	else throw RowNotFound();
+}
+
+// Add row to table
+void Relation::addRow(string primary) {
+	rows.push_back(Row(this, primary, columnNames));
+	++size;
+}
+
+// Add column to table
+void Relation::addAttribute(attribute attrib) {
+	attributes.push_back(attrib);
+	columnNames.push_back(attrib.attributeName);
+	++colSize;
+	for (int i = 0; i < rows.size(); ++i) {
+		rows[i].columnNames.push_back(attrib.attributeName);
+		rows[i].columns.push_back("");
+	}
+}
+
 // Input operator loads a relation from input file
 istream& operator>>(istream& in, Relation& table) {
 	string line = "";
@@ -199,7 +224,7 @@ istream& operator>>(istream& in, Relation& table) {
 			else if (attribs[i].attributeType == "int")
 				rows[rows.size() - 1].set(attribs[i].attributeName, atoi(tempData[i].c_str()));
 			else if (attribs[i].attributeType == "double")
-				rows[rows.size() - 1].set(attribs[i].attributeName, stod(tempData[i].c_str()));
+				rows[rows.size() - 1].set(attribs[i].attributeName, atof(tempData[i].c_str()));
 		}
 		tempData.clear();
 	}

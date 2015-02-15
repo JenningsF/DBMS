@@ -9,10 +9,12 @@
 
 #ifndef _DBEngine_
 #define _DBEngine_1
+#include <cstdlib>
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <stdlib.h>
 #include <vector>
 
 using namespace std;
@@ -44,9 +46,65 @@ struct attribute {
 	}
 };
 
-// Forward declaration of Relation class
-class Relation;
+class Row;
 
+// Relation class to hold loaded table
+class Relation {
+	private:
+		friend class Row;
+		string name;
+		int size;
+		int colSize;
+		vector<Row> rows;
+		vector<string> columnNames;
+	public:
+		// What makes-up PrimaryKey 
+		vector<string> keyParameters;
+		// Column attributes
+		vector<attribute> attributes;
+		// Constructors
+		Relation() : name("") {}
+		Relation(string n, vector<attribute> attribs = vector<attribute>()) {
+			 name = n;
+			 attributes = attribs;
+			 size = 0;
+		}
+		// Getter functions
+		string getName() {return name;}
+		int getSize() { return size; }
+		int getColumnSize() { return colSize; }
+		vector<string> getColumnNames() { return columnNames; }
+		const vector<Row> getRows() { return rows; }
+		Row getRow(int i);
+		// Setter functions
+		void setAttributes(vector<attribute> attribs) { 
+			attributes = attribs; 
+			colSize = attribs.size();
+		}
+		void setKeyParameters(vector<string> keys) { keyParameters = keys; }
+		void setRows(vector<Row> r) {
+			rows = r;
+			size = rows.size();
+		}
+		void setColumnNames() {
+			for (int i = 0; i < attributes.size(); ++i) {
+				columnNames.push_back(attributes[i].attributeName);
+			}
+		}
+		// Add row to table
+		void addRow(string primary);
+		void incrementSize() { ++size; }
+		// Add column to table
+		void addAttribute(attribute attrib);
+		// Remove row based on index
+		void deleteRow(int i) {
+			if (i < size) {
+				rows.erase(rows.begin() + i);
+				--size;
+			}
+			else throw RowNotFound();
+		}
+};
 // Row class to make up relation
 class Row {
 private:
@@ -86,7 +144,7 @@ public:
 			else if (table->attributes[index].attributeType == "int")
 				return atoi(columns[index].c_str());
 			else if (table->attributes[index].attributeType == "double")
-				return stod(columns[index].c_str());
+				return atof(columns[index].c_str());
 		}
 		else throw ColumnNotFound();
 	}
@@ -118,79 +176,6 @@ public:
 			return columns[i]; 
 		else throw DataNotFound();
 	}
-};
-
-// Relation class to hold loaded table
-class Relation {
-	private:
-		friend class Row;
-		string name;
-		int size;
-		int colSize;
-		vector<Row> rows;
-		vector<string> columnNames;
-	public:
-		// What makes-up PrimaryKey 
-		vector<string> keyParameters;
-		// Column attributes
-		vector<attribute> attributes;
-		// Constructors
-		Relation() : name("") {}
-		Relation(string n, vector<attribute> attribs = vector<attribute>()) {
-			 name = n;
-			 attributes = attribs;
-			 size = 0;
-		}
-		// Getter functions
-		string getName() {return name;}
-		int getSize() { return size; }
-		int getColumnSize() { return colSize; }
-		vector<string> getColumnNames() { return columnNames; }
-		const vector<Row> getRows() { return rows; }
-		Row getRow(int i) { 
-			if (i < size)
-				return rows[i];
-			else throw RowNotFound();
-		}
-		// Setter functions
-		void setAttributes(vector<attribute> attribs) { 
-			attributes = attribs; 
-			colSize = attribs.size();
-		}
-		void setKeyParameters(vector<string> keys) { keyParameters = keys; }
-		void setRows(vector<Row> r) {
-			rows = r;
-			size = rows.size();
-		}
-		void setColumnNames() {
-			for (int i = 0; i < attributes.size(); ++i) {
-				columnNames.push_back(attributes[i].attributeName);
-			}
-		}
-		// Add row to table
-		void addRow(string primary) {
-			rows.push_back(Row(this, primary, columnNames));
-			++size;
-		}
-		void incrementSize() { ++size; }
-		// Add column to table
-		void addAttribute(attribute attrib) {
-			attributes.push_back(attrib);
-			columnNames.push_back(attrib.attributeName);
-			++colSize;
-			for (int i = 0; i < rows.size(); ++i) {
-				rows[i].columnNames.push_back(attrib.attributeName);
-				rows[i].columns.push_back("");
-			}
-		}
-		// Remove row based on index
-		void deleteRow(int i) {
-			if (i < size) {
-				rows.erase(rows.begin() + i);
-				--size;
-			}
-			else throw RowNotFound();
-		}
 };
 
 // Function to scan first line of .db file
