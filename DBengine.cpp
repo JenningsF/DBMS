@@ -46,44 +46,48 @@ void DBengine::exit() {
 }
 
 // Gokul's function
-void DBengine::write(string fileName, vector<attribute> attrVect, vector<string> primaryKey) {
-	/*
+void DBengine::write(string tableName) {
+	
 	ofstream outfile;
-	if (!ifstream(fileName)) { //if the file does not exist
-		create(fileName, attrVect, primaryKey); //create the .db file
-	}
-	outfile.open(fileName);
+	string fileName = tableName + ".db";
+	// if (!ifstream(fileName)) { //if the file does not exist
+	// 	create(fileName, attrVect, primaryKey); //create the .db file
+	// }
+	outfile.open(fileName.c_str(), ios::out | ios::app | ios::trunc);
 
 	if (outfile.is_open()){
-		for (int i = 0; i < attrVect.size(); ++i) {
-			outfile << attrVect[i].attributeName << '|' << attrVect[i].attributeType << '|' << attrVect[i].attributeSize << " ";
+		for (int i = 0; i < tables.size(); ++i) {
+			string relationName = tables[i]->getName();
+			if(relationName == tableName)
+				outfile << tables[i] << endl;
+			//outfile << attrVect[i].attributeName << '|' << attrVect[i].attributeType << '|' << attrVect[i].attributeSize << " ";
 		}
 	}
 	outfile.close();
-	*/
+	
 }
 
 
 
 // Gokul's function
 void DBengine::show(string fileName) { //prints contents of a file to screen
-	/*
+	
 	ifstream infile(fileName);
 	if (infile.fail()){
 		cout << "File failed to open\n";
 		exit();
 	}
 
-	cout << infile.rdbuf();
+	cout << infile.rdbuf() << endl;
 	infile.close();
-	*/
+	
 }
 
 // Cody's function
 void DBengine::select(string tableName) {
 	for (int i = 0; i < tables.size(); ++i) {
 		string name = tables[i]->getName();
-		if (name == tableName)
+		if (name == tableName) 
 			table = tables[i];
 	}
 }

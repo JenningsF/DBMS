@@ -207,7 +207,7 @@ class DBengine {
 		// Closes myfile filestream
 		bool close();
 		void exit();
-		void write(string fileName, vector<attribute> attrVect, vector<string> primaryKey);
+		void write(string tableName);
 		void show(string filename);
 		// Sets table to relation specified by argument name
 		void select(string tableName);
