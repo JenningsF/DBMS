@@ -207,15 +207,17 @@ class DBengine {
 		// Closes myfile filestream
 		bool close();
 		void exit();
-		void write(string fileName, vector<attribute> attrVect, vector<string> primaryKey);
+		void write(string tableName);
 		void show(string filename);
 		// Sets table to relation specified by argument name
 		void select(string tableName);
 		void output();
 		void create(string fileName, vector<attribute> attrVect, vector<string> primaryKey);
 		void insert(string tableName, attribute newAttr);
-		void del();
-		void update();
+		template <typename T>
+		void del(Relation* table, string colName, T rowToDel);
+		template <typename T>
+		void update(Relation* table, int rowIndex, string colName, T whatToUpdate);
 };
 
 #endif

@@ -9,6 +9,8 @@
 	DB.select("animals");
 	DB.output();
 	DB.select("humans");
-	DB.output();
+	//DB.output();
+	DB.show("humans.db");
+	DB.write("humans");
 	return 0;
 }
