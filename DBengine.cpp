@@ -1,13 +1,4 @@
 //********************************************************
-// Name			: 
-// Date			: 13 Febuary 2015
-// Subject		: CSCE 315-504
-// Assignment	: Project 2: DBMS
-// Updated		: 11 February 2015
-// Description	: Database Engine where functions will be defined
-//********************************************************
-
-//********************************************************
 // Name			: Quintin Denman
 //			    : Jennings Fairchild
 //				: Cody Taylor
@@ -46,44 +37,48 @@ void DBengine::exit() {
 }
 
 // Gokul's function
-void DBengine::write(string fileName, vector<attribute> attrVect, vector<string> primaryKey) {
-	/*
+void DBengine::write(string tableName) {
+	
 	ofstream outfile;
-	if (!ifstream(fileName)) { //if the file does not exist
-		create(fileName, attrVect, primaryKey); //create the .db file
-	}
-	outfile.open(fileName);
+	string fileName = tableName + ".db";
+	// if (!ifstream(fileName)) { //if the file does not exist
+	// 	create(fileName, attrVect, primaryKey); //create the .db file
+	// }
+	outfile.open(fileName.c_str(), ios::out | ios::app | ios::trunc);
 
 	if (outfile.is_open()){
-		for (int i = 0; i < attrVect.size(); ++i) {
-			outfile << attrVect[i].attributeName << '|' << attrVect[i].attributeType << '|' << attrVect[i].attributeSize << " ";
+		for (int i = 0; i < tables.size(); ++i) {
+			string relationName = tables[i]->getName();
+			if(relationName == tableName)
+				outfile << tables[i] << endl;
+			//outfile << attrVect[i].attributeName << '|' << attrVect[i].attributeType << '|' << attrVect[i].attributeSize << " ";
 		}
 	}
 	outfile.close();
-	*/
+	
 }
 
 
 
 // Gokul's function
 void DBengine::show(string fileName) { //prints contents of a file to screen
-	/*
+	
 	ifstream infile(fileName);
 	if (infile.fail()){
 		cout << "File failed to open\n";
 		exit();
 	}
 
-	cout << infile.rdbuf();
+	cout << infile.rdbuf() << endl;
 	infile.close();
-	*/
+	
 }
 
 // Cody's function
 void DBengine::select(string tableName) {
 	for (int i = 0; i < tables.size(); ++i) {
 		string name = tables[i]->getName();
-		if (name == tableName)
+		if (name == tableName) 
 			table = tables[i];
 	}
 }
@@ -126,7 +121,7 @@ void DBengine::insert(string tableName, attribute newAttr) {
 	fileHolder[0] = newColumnList;
 	ofstream outfile(tableName.c_str());
 	if (outfile.is_open()){
-		for (int i = 0; i < fileHolder.size(); ++i){
+		for (int i = 0; i < fileHolder.size(); ++i) {
 			outfile << fileHolder[i] << endl;
 		}
 	}
@@ -134,13 +129,31 @@ void DBengine::insert(string tableName, attribute newAttr) {
 }
 
 // Jennings' function
-void DBengine::del() {
-
+// deletes specified row by content given or deletes entire table with '*' indicator
+template <typename T>
+void DBengine::del(Relation* table, string colName, T rowToDel) {
+	vector<string> rows = table.getRows();
+	vector<attribute> attributesVect = table.attributes;
+	// '*' signals to delete entire table
+	if (colName.compare('*') == 0 || rowToDel == '*') {
+		for (int i = 0; i < table.getSize(); ++i) {
+			table.deleteRow(j);
+		}
+	}
+	else for (int j = 0; j < rows.size(); ++j) {
+		if (rows[j].get(colName) == rowToDel) {
+			table.deleteRow(j);
+		}
+	}
 }
 
 // Jennings' function
-void DBengine::update() {
-
+bool DBengine::update(Relation* table, int rowIndex, string colName, T whatToUpdate) {
+	Row changedRow = table.getRow(rowIndex);
+	if (changedRow.set(colName, whatToUpdate)) {
+		return true;
+	}
+	else return false;
 }
 
 // Cody's functions
