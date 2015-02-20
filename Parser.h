@@ -23,9 +23,8 @@ public:
 	}
 	void parse(string l);
 	void parse_command(string l);
-	void parse_query() {
-
-	}
+	void parse_create(string l);
+	//void parse_query() {}
 
 }; 
 

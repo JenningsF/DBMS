@@ -15,37 +15,50 @@ string_command hashit(string const& inString){ //string type can's be used in sw
 	if (inString == "SHOW") return eShow;
 }
 
+//------------------------------------------------------------------------------------------------------
+//Parser:: parse(string l)
+
 void Parser:: parse(string l){
 	string temp = l.substr(0, l.find(' '));
 	if (temp == "CREATE" || temp == "OPEN" || temp == "INSERT" || temp == "SHOW" || temp == "WRITE" || temp == "CLOSE" || temp == "EXIT")
 		parse_command(l);
-	else parse_query();
+	//else parse_query();
 }
+
+//--------------------------------------------------------------------------------------------------------
+// Parser:: parse_command(string l)
 
 
 void Parser:: parse_command(string l){
 	string temp = l.substr(0, l.find(' '));
-	l.erase(0, l.find(' ') + 1);
+	size_t delim = l.find(' ') + 1;
+	l.erase(0, delim);
 	string relation_name, pause;
 	string_command command = hashit(temp);
 	switch (command){
 	case eCreate:
 		cout << "Call create for: " << l << endl;
 		cin >> pause;
+		//delim = l.find(' ') + 1; //erase TABLE before calling parse_create
+		//l.erase(0, delim);
+		//parse_create(l);
 		break;
 	case eInsert:
+		cout << "Call insert for: " << l << endl;
+		cin >> pause;
 		break;
 	case eShow:
-		relation_name = line.substr(0, line.find(' '));
+		relation_name = l.substr(0, l.find(' '));
 		cout << "Call show for relation: " << relation_name << endl;
+		cin >> pause;
 		break;
 	case eWrite:
-		relation_name = line.substr(0, line.find(' '));
+		relation_name = l.substr(0, l.find(' '));
 		cout << "Call write to table name: " << relation_name << endl;
 		cin >> pause;
 		break;
 	case eClose:
-		relation_name = line.substr(0, line.find(' '));
+		relation_name = l.substr(0, l.find(' '));
 		cout << "Call close for file: " << relation_name << endl;
 		cin >> pause;
 		break;
@@ -59,17 +72,37 @@ void Parser:: parse_command(string l){
 		cin >> pause;
 		break;
 	}
-
-
 }
 
+//--------------------------------------------------------------------------------------------------------------------
+//Parser:: parse_create(string l)
+/*
+void Parser::parse_create(string l){
+
+	size_t pos = l.find('(') + 1;
+	string relation_name, typed_attribute_list, attribute_list;
+	relation_name = l.substr(0, l.find(' '));
+	l.erase(0, pos); //erase everything up to and including '("'
+	cout << "\n" << l << endl;
+	size_t close_paren = l.find(")");
+	string delimeter = ", ";
+	pos = 0;
+	cout << typed_attribute_list << endl;
+}
+*/
+//---------------------------------------------------------------------------------------------------------------------
 int main(){
 
 
 	string test_command = "CREATE TABLE animals (name VARCHAR(20), kind VARCHAR(8), years INTEGER) PRIMARY KEY (name, kind);";
 	Parser test(test_command);
-	
-	
-
+	test_command = "INSERT INTO animals VALUES FROM (Joe, cat, 4);"; //removed the "" for testing
+	Parser test2(test_command);
+	test_command = "SHOW animals";
+	Parser test3(test_command);
+	test_command = "WRITE animals";
+	Parser test4(test_command);
+	test_command = "CLOSE animals";
+	Parser test5(test_command);
 
 }
