@@ -1,5 +1,11 @@
 #include <string>
+#include <iostream>
 #include "DBengine.h"
+
+using namespace std;
+
+enum string_command{eOpen, eClose, eInsert, eCreate, eWrite, eExit, eUpdate, eDelete, eShow};
+string_command hashit(string const& insString);
 
 class Parser {
 private:
@@ -15,15 +21,14 @@ public:
 		line.erase(0,line.find(' ') + 1);
 
 	}
-	bool parse(string l) {		
-		string temp = line.substr(0,line.find(' '));
-		if (temp == "CREATE" || temp == "OPEN" ....)
-			parse_command();
-		else parse_query();
-	}
-	void parse_command();
+	void parse(string l);
+	void parse_command(string l);
 	void parse_query() {
 
 	}
 
 }; 
+
+
+
+

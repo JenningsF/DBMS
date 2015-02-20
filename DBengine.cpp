@@ -148,11 +148,12 @@ void DBengine::del(Relation* table, string colName, T rowToDel) {
 }
 
 // Jennings' function
-bool DBengine::update(Relation* table, int rowIndex, string colName, T whatToUpdate) {
+template <typename T>
+void DBengine::update(Relation* table, int rowIndex, string colName, T whatToUpdate) {n
 	Row changedRow = table.getRow(rowIndex);
 	if (changedRow.set(colName, whatToUpdate)) {
 		return true;
-	}
+	}          
 	else return false;
 }
 
