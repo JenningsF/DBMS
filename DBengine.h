@@ -37,7 +37,11 @@ struct attribute {
 		attributeType = type;
 		isPk = pk;
 		attributeSize = size;
-	}
+	};
+/*	attribute(string name, string type) : attributeSize(0), isPk(false) {
+		attributeName = name;
+		attributeType = type;
+	}*/
 	attribute(const attribute& a) {
 		attributeName = a.attributeName;
 		attributeType = a.attributeType;

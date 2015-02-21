@@ -15,12 +15,6 @@ string_command hashit(string const& inString){ //string type can's be used in sw
 	if (inString == "SHOW") return eShow;
 }
 
-string_type hashtype(string const& inString){
-
-	if (inString == "VARCHAR") return eChar;
-	if (inString == "INTEGER") return eInt;
-}
-
 //------------------------------------------------------------------------------------------------------
 //Parser:: parse(string l)
 
@@ -80,46 +74,10 @@ void Parser:: parse_command(string l){
 	}
 }
 
-//-------------------------------------------------------------------------------------------------------
-void parse_type(string l, vector<attribute> attrVector, vector<string> primaryKey){
-
-	while (l.size() > 2){
-		string temp_type, temp_name;
-		int temp_size;
-		temp_name = l.substr(0, l.find(' ')); //get the name for attribute
-		primaryKey.push_back(temp_name);
-		l.erase(0, l.find(' ') + 1);
-		temp_type = l.substr(0, l.find('R') + 1);//all the types end with R
-		string_type type = hashtype(temp_type);
-
-		switch (type){ //switch the type for attribute
-		case eChar:
-			temp_type = "Char";
-			l.erase(0, l.find('(') + 1);//erase up to '(' before size
-			temp_size = stoi(l.substr(0, l.find(')')));
-			//attribute temp_attr(temp_name, temp_type, 0, temp_size);
-			cout << "Parsed attribute name:" << temp_name << " type: " << temp_type << " size:" << temp_size << endl;
-			l.erase(0, l.find(')') + 3);
-			break;
-		case eInt:
-			temp_type = "Int";
-			cout << "Parsed attribute name:" << temp_name << " type: " << temp_type << endl;
-			l.erase(0, l.find(')') + 1);
-			break;
-		default:
-			cout << "Something went wrong in parse_type switch(type)\n";
-		}
-		//l.erase(0, (l.find(" ") + 3));
-	}
-}
-
 //--------------------------------------------------------------------------------------------------------------------
 //Parser:: parse_create(string l)
 
 void Parser::parse_create(string l){
-
-	vector<attribute> attrVect;
-	vector<string> primaryKey;
 
 	size_t pos = l.find('(') + 1;
 	string relation_name, typed_attribute_list, attribute_list;
@@ -127,11 +85,12 @@ void Parser::parse_create(string l){
 	l.erase(0, pos); //erase everything up to and including '("'
 	string delimeter = ", ";
 	pos = 0;
-	typed_attribute_list = l.substr(0, l.find(" PRIMARY")) + "  ";
+	typed_attribute_list = l.substr(0, l.find(") PRIMARY"));
 	cout << "typed attribute list: " << typed_attribute_list << endl;
-	parse_type(typed_attribute_list, attrVect, primaryKey);
-}
+	l.erase(0, l.find('"'));
+	cout << l << endl;
 
+}
 
 //---------------------------------------------------------------------------------------------------------------------
 int main(){
@@ -139,9 +98,9 @@ int main(){
 
 	string test_command = "CREATE TABLE animals (name VARCHAR(20), kind VARCHAR(8), years INTEGER) PRIMARY KEY (name, kind);";
 	Parser test(test_command);
-	test_command = "CREATE TABLE species (kind VARCHAR(10)) PRIMARY KEY (kind);"; //removed the "" for testing
+	/*test_command = "INSERT INTO animals VALUES FROM (Joe, cat, 4);"; //removed the "" for testing
 	Parser test2(test_command);
-	/*test_command = "SHOW animals";
+	test_command = "SHOW animals";
 	Parser test3(test_command);
 	test_command = "WRITE animals";
 	Parser test4(test_command);

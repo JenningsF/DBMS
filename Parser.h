@@ -1,11 +1,14 @@
 #include <string>
 #include <iostream>
+#include <string>
 #include "DBengine.h"
 
 using namespace std;
 
 enum string_command{eOpen, eClose, eInsert, eCreate, eWrite, eExit, eUpdate, eDelete, eShow};
-string_command hashit(string const& insString);
+string_command hashit(string const& inString);
+enum string_type{eChar, eInt};
+string_type hashtype(string const& inString);
 
 class Parser {
 private:
