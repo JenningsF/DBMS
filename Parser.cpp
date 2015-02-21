@@ -79,7 +79,7 @@ void Parser:: parse_command(string l){
 	}
 }
 
-<<<<<<< HEAD
+
 //-------------------------------------------------------------------------------------------------------
 void parse_type(string l, vector<attribute> attrVector, vector<string> primaryKey){
 
@@ -111,7 +111,8 @@ void parse_type(string l, vector<attribute> attrVector, vector<string> primaryKe
 		}
 		//l.erase(0, (l.find(" ") + 3));
 	}
-=======
+}
+
 //--------------------------------------------------------------------------------------------------------
 //Parser::parse_query(string l)
 
@@ -128,7 +129,7 @@ vector<element> Parser::parse_query(string l)
 	//Use while loop and check for new atomic expression until end of line
 	//Append the parsed command to the vector initialized within parse_query 
 	//vector<element> parsed_command;
->>>>>>> 66a8d20e5327dd6aa595cdeebc4ea5cf56c22495
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------
@@ -153,9 +154,6 @@ void Parser::parse_create(string l){
 
 //---------------------------------------------------------------------------------------------------------------------
 int main(){
-<<<<<<< HEAD
-
-
 	string test_command = "CREATE TABLE animals (name VARCHAR(20), kind VARCHAR(8), years INTEGER) PRIMARY KEY (name, kind);";
 	Parser test(test_command);
 	test_command = "CREATE TABLE species (kind VARCHAR(10)) PRIMARY KEY (kind);"; //removed the "" for testing
@@ -166,20 +164,4 @@ int main(){
 	Parser test4(test_command);
 	test_command = "CLOSE animals";
 	Parser test5(test_command);*/
-
-=======
-	Parser test;
-	test.parse_select("select(kind = dog)");
-	// string test_command = "CREATE TABLE animals (name VARCHAR(20), kind VARCHAR(8), years INTEGER) PRIMARY KEY (name, kind);";
-	// Parser test(test_command);
-	// test_command = "INSERT INTO animals VALUES FROM (Joe, cat, 4);"; //removed the "" for testing
-	// Parser test2(test_command);
-	// test_command = "SHOW animals";
-	// Parser test3(test_command);
-	// test_command = "WRITE animals";
-	// Parser test4(test_command);
-	// test_command = "CLOSE animals";
-	// Parser test5(test_command);
-	return 0;
->>>>>>> 66a8d20e5327dd6aa595cdeebc4ea5cf56c22495
 }
