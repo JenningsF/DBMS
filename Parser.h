@@ -10,6 +10,11 @@ string_command hashit(string const& inString);
 enum string_type{eChar, eInt};
 string_type hashtype(string const& inString);
 
+struct element {
+	string key;
+	string value;
+};
+
 class Parser {
 private:
 	string line;
