@@ -7,6 +7,11 @@ using namespace std;
 enum string_command{eOpen, eClose, eInsert, eCreate, eWrite, eExit, eUpdate, eDelete, eShow};
 string_command hashit(string const& insString);
 
+struct element {
+	string key;
+	string value;
+};
+
 class Parser {
 private:
 	string line;

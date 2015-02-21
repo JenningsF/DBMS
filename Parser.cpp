@@ -22,12 +22,11 @@ void Parser:: parse(string l){
 	string temp = l.substr(0, l.find(' '));
 	if (temp == "CREATE" || temp == "OPEN" || temp == "INSERT" || temp == "SHOW" || temp == "WRITE" || temp == "CLOSE" || temp == "EXIT")
 		parse_command(l);
-	//else parse_query();
+	else parse_query(l);
 }
 
 //--------------------------------------------------------------------------------------------------------
-// Parser:: parse_command(string l)
-
+//Parser:: parse_command(string l)
 
 void Parser:: parse_command(string l){
 	string temp = l.substr(0, l.find(' '));
@@ -74,6 +73,24 @@ void Parser:: parse_command(string l){
 	}
 }
 
+//--------------------------------------------------------------------------------------------------------
+//Parser::parse_query(string l)
+
+vector<element> Parser::parse_select(string select)
+{
+	string temp = select.find('(') - select;
+	cout << temp;
+}
+
+vector<element> Parser::parse_query(string l)
+{
+	//Parse input
+	//calls function listed above to parse smaller objects
+	//Use while loop and check for new atomic expression until end of line
+	//Append the parsed command to the vector initialized within parse_query 
+	//vector<element> parsed_command;
+}
+
 //--------------------------------------------------------------------------------------------------------------------
 //Parser:: parse_create(string l)
 /*
@@ -92,17 +109,17 @@ void Parser::parse_create(string l){
 */
 //---------------------------------------------------------------------------------------------------------------------
 int main(){
-
-
-	string test_command = "CREATE TABLE animals (name VARCHAR(20), kind VARCHAR(8), years INTEGER) PRIMARY KEY (name, kind);";
-	Parser test(test_command);
-	test_command = "INSERT INTO animals VALUES FROM (Joe, cat, 4);"; //removed the "" for testing
-	Parser test2(test_command);
-	test_command = "SHOW animals";
-	Parser test3(test_command);
-	test_command = "WRITE animals";
-	Parser test4(test_command);
-	test_command = "CLOSE animals";
-	Parser test5(test_command);
-
+	Parser test;
+	test.parse_select("select(kind = dog)");
+	// string test_command = "CREATE TABLE animals (name VARCHAR(20), kind VARCHAR(8), years INTEGER) PRIMARY KEY (name, kind);";
+	// Parser test(test_command);
+	// test_command = "INSERT INTO animals VALUES FROM (Joe, cat, 4);"; //removed the "" for testing
+	// Parser test2(test_command);
+	// test_command = "SHOW animals";
+	// Parser test3(test_command);
+	// test_command = "WRITE animals";
+	// Parser test4(test_command);
+	// test_command = "CLOSE animals";
+	// Parser test5(test_command);
+	return 0;
 }
