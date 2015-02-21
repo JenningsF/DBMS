@@ -11,29 +11,29 @@ enum string_type{eChar, eInt};
 string_type hashtype(string const& inString);
 
 struct element {
-	string key;
+	string query_type;
+	string column;
 	string value;
+	vector<string> attributes;
 };
 
 class Parser {
 private:
 	string line;
 	string viewName;
+	vector<element> query;
 public:
 	Parser();
 	Parser(string l) : line(l) {
-		parse(l);
+		parse();
 	}
-	string get_atomic_exp() {
-		viewName = line.substr(0,line.find(' '));
-		line.erase(0,line.find(' ') + 1);
-
-	}
-	void parse(string l);
+	void parse();
 	void parse_command(string l);
 	void parse_create(string l);
-	//void parse_query() {}
-
+	//following functions used to parse query
+	element parse_select(string select_string);
+	element parse_list(string list_string);
+	void parse_query();
 }; 
 
 

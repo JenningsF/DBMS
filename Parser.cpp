@@ -24,11 +24,11 @@ string_type hashtype(string const& inString){
 //------------------------------------------------------------------------------------------------------
 //Parser:: parse(string l)
 
-void Parser:: parse(string l){
-	string temp = l.substr(0, l.find(' '));
+void Parser:: parse(){
+	string temp = line.substr(0, line.find(' '));
 	if (temp == "CREATE" || temp == "OPEN" || temp == "INSERT" || temp == "SHOW" || temp == "WRITE" || temp == "CLOSE" || temp == "EXIT")
-		parse_command(l);
-	else parse_query(l);
+		parse_command(line);
+	else parse_query();
 }
 
 //--------------------------------------------------------------------------------------------------------
@@ -114,22 +114,80 @@ void parse_type(string l, vector<attribute> attrVector, vector<string> primaryKe
 }
 
 //--------------------------------------------------------------------------------------------------------
-//Parser::parse_query(string l)
+//Parser::parse_query
 
-vector<element> Parser::parse_select(string select)
-{
-	string temp = select.find('(') - select;
-	cout << temp;
+//Parses select
+element Parser::parse_select(string select_string){
+	element select;
+	size_t pos = 0;
+	pos = select_string.find(" ");
+	select.query_type = select_string.substr(0, pos);
+	select_string.erase(0, pos + 2);
+	select.column = select_string.substr(0, pos = select_string.find(" "));
+	select_string.erase(0, pos + 5);
+	select.value = select_string.substr(0, pos = select_string.find("\""));
+	select_string.erase(0, pos + 3);
+	return select; 
 }
 
-vector<element> Parser::parse_query(string l)
-{
+//Parses rename and project
+element Parser::parse_list(string list_string) {
+	element list;
+	size_t pos = 0;
+	pos = list_string.find(" ");
+	list.query_type = list_string.substr(0, pos);
+	list_string.erase(0, pos + 2);
+	while (true){
+		pos = list_string.find(',');
+		if (pos == string::npos){
+			pos = list_string.find(')');
+			string temp = list_string.substr(0, pos);
+			list.attributes.push_back(temp);
+			break;
+		}
+		else {
+			string temp = list_string.substr(0, pos);
+			list.attributes.push_back(temp);
+			list_string.erase(0, pos + 2);
+		}
+	}
+	return list;
+}
+
+void Parser::parse_query() {
 	//Parse input
 	//calls function listed above to parse smaller objects
 	//Use while loop and check for new atomic expression until end of line
 	//Append the parsed command to the vector initialized within parse_query 
 	//vector<element> parsed_command;
-
+	
+	//Strip off viewName
+	size_t pos = 0;
+	pos = line.find(" ");
+	viewName = line.substr(0,pos);
+	line.erase(0,pos + 4);
+	//Process Query
+	while(pos != string::npos){
+		pos = line.find(" ");
+		string temp = line.substr(0,pos);
+		if (temp == "select"){
+			pos = line.find(')') + 1;
+			string select_string = line.substr(0, pos);
+			element sel = parse_select(select_string);
+			query.push_back(sel);
+			line.erase(0, pos);
+		}
+		else if (temp == "rename" || temp == "project"){
+			pos = line.find(')') + 1;
+			string list_string = line.substr(0, pos);
+			element list = parse_list(list_string);
+			query.push_back(list);
+			line.erase(0, pos);
+		}
+		else {
+			line.erase(0,pos + 1);
+		}
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------
