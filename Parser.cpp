@@ -87,7 +87,6 @@ void parse_type(string l, vector<attribute> attrVector, vector<string> primaryKe
 		string temp_type, temp_name;
 		int temp_size;
 		temp_name = l.substr(0, l.find(' ')); //get the name for attribute
-		primaryKey.push_back(temp_name);
 		l.erase(0, l.find(' ') + 1);
 		temp_type = l.substr(0, l.find('R') + 1);//all the types end with R
 		string_type type = hashtype(temp_type);
@@ -98,6 +97,7 @@ void parse_type(string l, vector<attribute> attrVector, vector<string> primaryKe
 			l.erase(0, l.find('(') + 1);//erase up to '(' before size
 			temp_size = stoi(l.substr(0, l.find(')')));
 			//attribute temp_attr(temp_name, temp_type, 0, temp_size);
+			primaryKey.push_back(temp_name);
 			cout << "Parsed attribute name:" << temp_name << " type: " << temp_type << " size:" << temp_size << endl;
 			l.erase(0, l.find(')') + 3);
 			break;
@@ -111,6 +111,12 @@ void parse_type(string l, vector<attribute> attrVector, vector<string> primaryKe
 		}
 		//l.erase(0, (l.find(" ") + 3));
 	}
+	cout << "Primary key holds: ";
+	for (int i = 0; i < primaryKey.size(); i++)
+	{
+		cout << primaryKey[i] << " ";
+	}
+	cout << endl;
 }
 
 //--------------------------------------------------------------------------------------------------------
