@@ -24,7 +24,7 @@ string_type hashtype(string const& inString){
 //------------------------------------------------------------------------------------------------------
 //Parser:: parse(string l)
 
-void Parser:: parse(){
+void Parser::parse(){
 	string temp = line.substr(0, line.find(' '));
 	if (temp == "CREATE" || temp == "OPEN" || temp == "INSERT" || temp == "SHOW" || temp == "WRITE" || temp == "CLOSE" || temp == "EXIT")
 		parse_command(line);
@@ -34,7 +34,7 @@ void Parser:: parse(){
 //--------------------------------------------------------------------------------------------------------
 //Parser:: parse_command(string l)
 
-void Parser:: parse_command(string l){
+void Parser::parse_command(string l){
 	string temp = l.substr(0, l.find(' '));
 	size_t delim = l.find(' ') + 1;
 	l.erase(0, delim);
@@ -95,7 +95,7 @@ void parse_type(string l, vector<attribute> attrVector, vector<string> primaryKe
 		case eChar:
 			temp_type = "Char";
 			l.erase(0, l.find('(') + 1);//erase up to '(' before size
-			temp_size = stoi(l.substr(0, l.find(')')));
+			temp_size = atoi(l.substr(0, l.find(')')).c_str());
 			//attribute temp_attr(temp_name, temp_type, 0, temp_size);
 			primaryKey.push_back(temp_name);
 			cout << "Parsed attribute name:" << temp_name << " type: " << temp_type << " size:" << temp_size << endl;
@@ -121,19 +121,63 @@ void parse_type(string l, vector<attribute> attrVector, vector<string> primaryKe
 
 //--------------------------------------------------------------------------------------------------------
 //Parser::parse_query
+void trimQuote(string& s) {
+	string temp = "";
+	if (s[0] == '"' && s[s.length() - 1] == '"')
+		temp = s.substr(1, s.length() - 2);
+	s = temp;
+}
+
+//Parser::Validate Query objects
+bool Parser::ValidateSelect() {
+	for (int i = 0; i < query.size(); ++i) {
+		for (int j = 0; j < query[i].attributes.size(); ++j) {
+			string ops = query[i].attributes[j];
+			// Primative check to ensure expected values obtained
+			if (ops != "&&" && ops != "==" && ops != "!=" && ops != "||"
+				&& ops != "<" && ops != ">" && ops != "<=" && ops != ">=")
+				return false;
+		}
+	}
+	return true;
+}
 
 //Parses select
-element Parser::parse_select(string select_string){
-	element select;
+bool Parser::parse_select(string select_string){
+	string type = "";
 	size_t pos = 0;
 	pos = select_string.find(" ");
-	select.query_type = select_string.substr(0, pos);
+	type = select_string.substr(0, pos);
 	select_string.erase(0, pos + 2);
-	select.column = select_string.substr(0, pos = select_string.find(" "));
-	select_string.erase(0, pos + 5);
-	select.value = select_string.substr(0, pos = select_string.find("\""));
-	select_string.erase(0, pos + 3);
-	return select; 
+	// While loop to parse all conditions of select
+	while (select_string.length() != 0) {
+		element select;
+		// Get column name and erase from command
+		select.query_type = type;
+		select.column = select_string.substr(0, pos = select_string.find(" "));
+		select_string.erase(0, select.column.length() + 1);
+		// Get attribute value and erase from command
+		select.attributes.push_back(select_string.substr(0, 2));
+		select_string.erase(0, 3);
+		// See if there is additional conditions
+		pos = select_string.find(" ");
+		if (pos == string::npos) {
+			// No more conditions
+			select.value = select_string.substr(0, select_string.find(")"));
+			select_string.erase(0, select.value.length()+1);
+		}
+		else {
+			// Additional conitions expected
+			select.value = select_string.substr(0, pos);
+			select_string.erase(0, pos+1);
+			pos = select_string.find(" ");
+			select.attributes.push_back(select_string.substr(0, pos));
+			select_string.erase(0, pos+1);
+		}
+		trimQuote(select.value);
+		query.push_back(select);
+	}
+	return ValidateSelect();
 }
 
 //Parses rename and project
@@ -179,8 +223,7 @@ void Parser::parse_query() {
 		if (temp == "select"){
 			pos = line.find(')') + 1;
 			string select_string = line.substr(0, pos);
-			element sel = parse_select(select_string);
-			query.push_back(sel);
+			bool test = parse_select(select_string);
 			line.erase(0, pos);
 		}
 		else if (temp == "rename" || temp == "project"){
@@ -190,12 +233,16 @@ void Parser::parse_query() {
 			query.push_back(list);
 			line.erase(0, pos);
 		}
-		else {
+		else { // Relational algebra
+			// Stores relation on left hand side
+			fromName = line.substr(0, pos);
 			line.erase(0,pos + 1);
+			// Stores which operation to perform
+			op = line[0];
+			line.erase(0, line.find(' ') + 1);
 		}
 	}
 }
-
 //--------------------------------------------------------------------------------------------------------------------
 //Parser:: parse_create(string l)
 

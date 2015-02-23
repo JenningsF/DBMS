@@ -8,7 +8,7 @@
 	DB.close();
 	DB.select("animals");
 	//DB.output();
-	DB.write("anials");
+	DB.write("animals");
 	DB.select("humans");
 	//DB.output();
 	DB.show("humans.db");
