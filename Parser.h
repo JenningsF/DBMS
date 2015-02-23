@@ -21,6 +21,8 @@ class Parser {
 private:
 	string line;
 	string viewName;
+	string fromName;
+	char op;
 	vector<element> query;
 public:
 	Parser();
@@ -32,7 +34,8 @@ public:
 	void parse_create(string l);
 	void parse_insert(string l);
 	//following functions used to parse query
-	element parse_select(string select_string);
+	bool ValidateSelect();
+	bool parse_select(string select_string);
 	element parse_list(string list_string);
 	void parse_query();
 }; 

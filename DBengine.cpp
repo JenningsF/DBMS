@@ -187,6 +187,60 @@ ostream& operator<<(ostream& out, Relation& table) {
 	return out;
 }
 
+
+// Overloaded equality operator for rows
+bool operator==(const Row& lrow, const Row& rrow) {
+	if (lrow.getPK() == rrow.getPK() && lrow.getColmns() == rrow.getColmns()
+		&& lrow.getColumnNames() == rrow.getColumnNames())
+		return true;
+	else return false;
+}
+
+
+// Overloaded equality operator for attribute
+bool operator==(const attribute& lattr, const attribute& rattr) {
+	if (lattr.attributeName == rattr.attributeName 
+		&& lattr.attributeType == rattr.attributeType
+		&& lattr.attributeSize == rattr.attributeSize
+		&& lattr.isPk == rattr.isPk)
+		return true;
+	else return false;
+}
+
+// Overloaded set union operator for relation
+Relation* operator+(Relation& ltable, Relation& rtable) {
+	if (ltable.keyParameters == rtable.keyParameters 
+		&& ltable.attributes == rtable.attributes) 
+	{
+		Relation* table = new Relation("", ltable.attributes);
+		table->addRows(ltable.getRows());
+		table->addRows(rtable.getRows());
+		return table;
+	}
+	else return NULL;
+}
+
+// Overloaded set difference operator for relation
+Relation* operator-(Relation& ltable, Relation& rtable) {	
+	if (ltable.keyParameters == rtable.keyParameters 
+		&& ltable.attributes == rtable.attributes) 
+	{
+		Relation* table = new Relation("", ltable.attributes);
+		table->addRows(ltable.getRows());
+		for (int i = 0; i < rtable.getSize(); ++i) {
+			for (int j = 0; j < table.getSize(); ++j) {
+				if (rtable.getRow(i).getPK() == table->getRow(j).getPK()) {
+					table->deleteRow(j);
+					break;
+				}
+				else continue;
+			}
+		}
+		return table;
+	}
+	else return NULL;
+}
+
 // Relation Function Definitions
 Row Relation::getRow(int i) { 
 	if (i < size)

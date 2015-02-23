@@ -81,6 +81,7 @@ class Relation {
 		const vector<Row> getRows() { return rows; }
 		Row getRow(int i);
 		// Setter functions
+		void setName(string n) {name = n;}
 		void setAttributes(vector<attribute> attribs) { 
 			attributes = attribs; 
 			colSize = attribs.size();
@@ -97,6 +98,23 @@ class Relation {
 		}
 		// Add row to table
 		void addRow(string primary);
+		void addRow(Row r) {
+			bool exists = false;
+			for (int j = 0; j < rows.size(); ++j) {
+				if (rows[j].getPK() == r.getPK())
+					exists = true;
+				else continue;
+			}
+			if (!exists) {
+				rows.push_back(Row(this, r));
+				++size;
+			}			
+		}
+		void addRows(vector<Row> r) {
+			for (int i = 0; i < r.size(); ++i) {
+				addRow(r[i]);
+			}
+		}
 		void incrementSize() { ++size; }
 		// Add column to table
 		void addAttribute(attribute attrib);
@@ -128,6 +146,14 @@ public:
 		columnNames = cols;
 		columns = vector<string>(cols.size());
 	}
+
+	Row(const Relation* tab, Row r) {
+		table = tab;
+		PK = r.PK;
+		columnNames = r.columnNames;
+		columns = r.columns;
+	}
+
 	// Gets index of data related to Column Name
 	int findIndex(string colName) {
 		for (int i = 0; i < columnNames.size(); ++i) {
@@ -153,6 +179,9 @@ public:
 		else throw ColumnNotFound();
 	}
 
+	// Get Primary Key
+	string getPK() { return PK; }
+
 	// Sets column data
 	template <typename T>
 	bool set(string colName, T data) {
@@ -174,12 +203,20 @@ public:
 		return true;
 	}
 
+	void setTable(Relation* t) {
+		table = t;
+	}
+
 	// For outputting to .db file
 	const string operator[](int i) { 
-		if (i < columns.size()) 
+		if (i >= 0 && i < columns.size()) 
 			return columns[i]; 
 		else throw DataNotFound();
 	}
+
+	// Getters of columns and column names
+	const vector<string> getColumns() { return columns; }
+	const vector<string> getColumnNames() { return columnNames; }
 };
 
 // Function to scan first line of .db file
@@ -193,6 +230,18 @@ ostream& operator<<(ostream& out, Relation& table);
 
 // Input operator loads a relation from input file
 istream& operator>>(istream& in, Relation& table);
+
+// Overloaded equality operator for rows
+bool operator==(const Row& lrow, const Row& rrow);
+
+// Overloaded equality operator for attribute
+bool operator==(const attribute& lattr, const attribute& rattr);
+
+// Overloaded set union operator for relation
+Relation operator+(Relation& ltable, Relation& rtable);
+
+// Overloaded set difference operator for relation
+Relation operator-(Relation& ltable, Relation& rtable);
 
 class DBengine {
 	private:
