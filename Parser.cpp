@@ -51,6 +51,8 @@ void Parser:: parse_command(string l){
 	case eInsert:
 		cout << "Call insert for: " << l << endl;
 		cin >> pause;
+		l.erase(0, l.find("INTO ") + 5);
+		parse_insert(l);
 		break;
 	case eShow:
 		relation_name = l.substr(0, l.find(' '));
@@ -81,7 +83,8 @@ void Parser:: parse_command(string l){
 
 
 //-------------------------------------------------------------------------------------------------------
-void parse_type(string l, vector<attribute> attrVector, vector<string> primaryKey){
+//void parse_type(string l, vector<attribute> attrVector, vector<string> primaryKey)
+void parse_type(string l, vector<string> primaryKey){
 
 	while (l.size() > 2){
 		string temp_type, temp_name;
@@ -96,7 +99,6 @@ void parse_type(string l, vector<attribute> attrVector, vector<string> primaryKe
 			temp_type = "Char";
 			l.erase(0, l.find('(') + 1);//erase up to '(' before size
 			temp_size = stoi(l.substr(0, l.find(')')));
-			//attribute temp_attr(temp_name, temp_type, 0, temp_size);
 			primaryKey.push_back(temp_name);
 			cout << "Parsed attribute name:" << temp_name << " type: " << temp_type << " size:" << temp_size << endl;
 			l.erase(0, l.find(')') + 3);
@@ -109,7 +111,6 @@ void parse_type(string l, vector<attribute> attrVector, vector<string> primaryKe
 		default:
 			cout << "Something went wrong in parse_type switch(type)\n";
 		}
-		//l.erase(0, (l.find(" ") + 3));
 	}
 	cout << "Primary key holds: ";
 	for (int i = 0; i < primaryKey.size(); i++)
@@ -201,7 +202,7 @@ void Parser::parse_query() {
 
 void Parser::parse_create(string l){
 
-	vector<attribute> attrVect;
+	//vector<attribute> attrVect;
 	vector<string> primaryKey;
 
 	size_t pos = l.find('(') + 1;
@@ -212,20 +213,54 @@ void Parser::parse_create(string l){
 	pos = 0;
 	typed_attribute_list = l.substr(0, l.find(" PRIMARY")) + "  ";
 	cout << "typed attribute list: " << typed_attribute_list << endl;
-	parse_type(typed_attribute_list, attrVect, primaryKey);
+	//parse_type(typed_attribute_list, attrVect, primaryKey);
+	parse_type(typed_attribute_list, primaryKey);
+}
+
+//--------------------------------------------------------------------------------------------------------------------
+//Parser:: parse_insert(string l)
+
+void Parser::parse_insert(string l){
+
+	string relation_name, expr, temp_literal;
+	vector<string> literals;
+	relation_name = l.substr(0, l.find(' '));
+	//cout << "INSERT INTO (Relation: " << relation_name << ") VALUES FROM (";
+	l.erase(0, l.find("FROM") + 5);
+	//cout << l << ")\n";
+	expr = l.substr(0, l.find(" "));
+	//cout << "EXPR: " << expr << endl;
+	if (expr != "RELATION"){
+		//need to get attributes of relation_name
+		l.erase(0, l.find('(') + 1); // Joe, cat, 4);
+		l.erase(l.find(')'), l.find(';') + 1);
+		l += " ";
+		//cout << "Erased ); at the end of: " << l << endl;
+		while (l.size() > 0){
+			temp_literal = l.substr(0, l.find(','));
+			literals.push_back(temp_literal);
+			l.erase(0, l.find(' ') + 1);
+		}
+		//for (int i = 0; i < literals.size(); i++){ cout << literals[i] << " "; }
+	}
+	else{ //needs to parse expr
+		l.erase(0, l.find("RELATION ") + 9);
+		expr = l.substr(0, l.find(';'));
+		//cout << expr << endl;
+	}
 }
 
 
 //---------------------------------------------------------------------------------------------------------------------
-int main(){
+/*int main(){
 	string test_command = "CREATE TABLE animals (name VARCHAR(20), kind VARCHAR(8), years INTEGER) PRIMARY KEY (name, kind);";
 	Parser test(test_command);
 	test_command = "CREATE TABLE species (kind VARCHAR(10)) PRIMARY KEY (kind);"; //removed the "" for testing
 	Parser test2(test_command);
-	/*test_command = "SHOW animals";
+	test_command = "INSERT INTO animals VALUES FROM (Joe, cat, 4);";
 	Parser test3(test_command);
-	test_command = "WRITE animals";
+	test_command = "INSERT INTO species VALUES FROM RELATION project (kind) animals;";
 	Parser test4(test_command);
 	test_command = "CLOSE animals";
-	Parser test5(test_command);*/
-}
+	Parser test5(test_command);
+}*/

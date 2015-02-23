@@ -30,6 +30,7 @@ public:
 	void parse();
 	void parse_command(string l);
 	void parse_create(string l);
+	void parse_insert(string l);
 	//following functions used to parse query
 	element parse_select(string select_string);
 	element parse_list(string list_string);
