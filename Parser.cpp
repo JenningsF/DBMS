@@ -251,7 +251,6 @@ void Parser::parse_query() {
 }
 //--------------------------------------------------------------------------------------------------------------------
 //Parser:: parse_create(string l)
-
 void Parser::parse_create(string l){
 
 	//vector<attribute> attrVect;
