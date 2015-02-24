@@ -98,12 +98,8 @@ void parse_type(string l, vector<string> primaryKey){
 		case eChar:
 			temp_type = "Char";
 			l.erase(0, l.find('(') + 1);//erase up to '(' before size
-<<<<<<< HEAD
-			temp_size = stoi(l.substr(0, l.find(')')));
-=======
 			temp_size = atoi(l.substr(0, l.find(')')).c_str());
 			//attribute temp_attr(temp_name, temp_type, 0, temp_size);
->>>>>>> 08193623081b542dbf8c81a58213018356f84542
 			primaryKey.push_back(temp_name);
 			cout << "Parsed attribute name:" << temp_name << " type: " << temp_type << " size:" << temp_size << endl;
 			l.erase(0, l.find(')') + 3);
