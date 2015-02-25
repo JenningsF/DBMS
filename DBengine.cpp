@@ -14,147 +14,233 @@
 
 using namespace std;
 
-bool DBengine::open(string name) {
-	string fileName = name + ".db";
+/*
+-- DONE --
+Open file and read into vector of Relations and then close file
+*/
+bool DBengine::open(string fileName) {
+	ifstream myfile;
+	string fileExtension = fileName.substr(fileName.size() - 3, 3);
+	if (fileExtension.compare(".db") != 0) {	// Checks is file extension exists
+		fileName += ".db";			// If it doesn't, adds '.db' extension
+	}
+
 	myfile.open(fileName.c_str());
 	if (myfile.is_open()) {
-		tables.push_back(new Relation(name));
+		tables.push_back(new Relation(fileName));
 		myfile >> *tables[tables.size()-1];
-	}
-	return false;
-}
-
-bool DBengine::close() {
-	myfile.close();
-	if (!(myfile.is_open())) {
+		myfile.close();
 		return true;
 	}
 	return false;
 }
 
-void DBengine::exit() {
-	std::exit(0);
-}
-
-// Gokul's function
-void DBengine::write(string tableName) {
-	
-	ofstream outfile;
-	string fileName = tableName + ".db";
-	// if (!ifstream(fileName)) { //if the file does not exist
-	// 	create(fileName, attrVect, primaryKey); //create the .db file
-	// }
-	outfile.open(fileName.c_str(), ios::out | ios::app | ios::trunc);
-
-	if (outfile.is_open()){
-		for (int i = 0; i < tables.size(); ++i) {
-			string relationName = tables[i]->getName();
-			if(relationName == tableName)
-				outfile << tables[i] << endl;
-			//outfile << attrVect[i].attributeName << '|' << attrVect[i].attributeType << '|' << attrVect[i].attributeSize << " ";
+/*
+-- DONE --
+Calls write function then closes the file and deletes from the vector of Relations
+*/
+bool DBengine::close(string fileName) {
+	string fileExtension = fileName.substr(fileName.size() - 3, 3);
+	if (fileExtension.compare(".db") == 0) {	// Checks is file extension exists
+		fileName.erase(filename.size() - 4, 3);			// If it does, delete '.db' extension
+	}
+	write(fileName);
+	for (int i = 0; i < tables.size(); ++i) {
+		string relationName = tables[i]->getName();
+		if(relationName == tableName) {
+			delete tables[i];
+			vector<Relation>::iterator iter = tables.begin() + i;
+			tables.erase(iter);
 		}
 	}
-	outfile.close();
-	
 }
 
+/*
+-- DONE --
+Iterates through vector of Relations and calls close on all relations
+that are being used and then exits the program
+*/
+void DBengine::exitEngine() {
+	int i = 0;
+	while (tables.size() != 0) {
+		close(tables[i]->getName());
+	}
+	exit(0);
+}
 
-
-// Gokul's function
-void DBengine::show(string fileName) { //prints contents of a file to screen
-	
-	ifstream infile(fileName);
-	if (infile.fail()){
-		cout << "File failed to open\n";
-		exit();
+/*
+-- DONE --
+Opens the file, writes changes made to the Relation, and then closes the file that was opened
+*/
+bool DBengine::write(string fileName) {
+	ofstream outfile;
+	string fileExtension = fileName.substr(fileName.size() - 3, 3);x
+	if (fileExtension.compare(".db") != 0) {	// Checks is file extension exists
+		string fileName = name + ".db";			// If it doesn't, adds '.db' extension
 	}
 
-	cout << infile.rdbuf() << endl;
-	infile.close();
-	
+	outfile.open(fileName.c_str(), ios_base::app);
+	if (outfile.is_open()) {
+		for (int i = 0; i < tables.size(); ++i) {
+			string relationName = tables[i]->getName();
+			if(relationName == fileName)
+				outfile << tables[i] << endl;
+		}
+		outfile.close();
+		return true;
+	}
+	return false;
 }
 
-// Cody's function
-void DBengine::select(string tableName) {
+
+
+/*
+-- DONE --
+Prints out table that is passed as an argument
+*/
+void DBengine::show(string tableName) {
 	for (int i = 0; i < tables.size(); ++i) {
-		string name = tables[i]->getName();
-		if (name == tableName) 
-			table = tables[i];
+		string relationName = tables[i]->getName();
+		if(relationName == tableName)
+			cout << tables[i] << endl;
 	}
 }
 
+/*
+-- DONE --
+Selects a portion or an entire Relation and creates a view with selected data
+Note: Does not create file unless create/write function is called
+*/
+Relation* DBengine::select(string tableName, vector<string> colNames, char allTableIndicator) {
+	for (int i = 0; i < tables.size(); ++i) {
+		if (tables[i]->getName() == tableName) 
+			Relation* tempTable = tables[i];
+	}
+	if (allTableIndicator == '*') {
+		Relation* wholeTable = new Relation(tempTable->getName(), tempTable->attributes);
+		return wholeTable;
+	}
+	else {
+		vector<Row> rows = tempTable->getRows();
+		vector<attribute> tempAttributes = tempTable->attributes;
+		vector<attribute> newAttributes;
+		// Iterate through both column name vectors to find matches
+		for (int j = 0; j < colNames.size(); ++j) {
+			for (int k = 0; k < tempAttributes.size(); ++k) {
+				if (colNames[j].compare(tempAttributes[k]->attributeName) == 0) {
+					newAttributes.push_back(tempAttributes[k]);
+				}
+			}
+		}
+		Relation* newRel = new Relation(tableName, newAttributes);
+		newRel.setColumnNames();
+		newRel.setRows(rows);
+		vector<Row> newRows = newRel->getRows();
+		vector<string> newColumns = newRel.getColumnNames();
+		// Sets row data
+		for (int m = 0; m < newRel.getColumnSize(); ++m) {
+			for (int n = 0; n < newRel.getSize(); ++n) {
+				newRows[l].set(newColumns[m], rows[n].get(newColumns[m]));
+			}
+		}
+		return newRel;
+	}
+}
+
+/*
+-- Strictly testing --
+*/
 void DBengine::output() {
 	cout << *table << endl << endl;
 }
 
-// Quintin's function
-void DBengine::create(string fileName, vector<attribute> attrVect, vector<string> primaryKey) {
-	/*Open an output stream for a new .db file*/
-	ofstream outfile(fileName.c_str());
-	/*Writes first line of file with attribute information*/
-	if (outfile.is_open()){
-		for (int i = 0; i < attrVect.size(); ++i) {
-			outfile << attrVect[i].attributeName << '|' << attrVect[i].attributeType << '|' << attrVect[i].attributeSize << " ";
-		}
-	}
-	/*Saves the file*/
-	outfile.close();
+/*
+-- DONE --
+Initilizes a Relation object, then pushes back on tables vector
+*/
+void DBengine::create(string tableName, vector<attribute> attrVect, vector<string> primaryKeys) {
+	Relation* rel = new Relation(tableName, attrVect);
+	rel.setKeyParameters(primaryKeys);
+	rel.setColumnNames();
+	tables.push_back(rel);
 }
 
 /*
-Quintin's function
-Input:	Table Name (string)
-New Attribute (attribute)
+-- DONE --
+Insert a Row into a Relation
 */
-void DBengine::insert(string tableName, attribute newAttr) {
-	ifstream in(tableName.c_str());
-	vector<string> fileHolder;
-	string line;
-	if (in.is_open()){
-		while (getline(in, line)) {
-			fileHolder.push_back(line);
+void DBengine::insert(string tableName, vector<attribute> rowData) {
+	for (int i = 0; i < tables.size(); ++i) {
+		if (tables[i]->getName() == tableName) {
+			Relation* tempTable = tables[i]
+			break;
 		}
 	}
-	in.close();
-	string newColumnList = newAttr.attributeName + '|' + newAttr.attributeType + '|';
-	newColumnList = newColumnList + char(newAttr.attributeSize) + " " + fileHolder[0];
-	fileHolder[0] = newColumnList;
-	ofstream outfile(tableName.c_str());
-	if (outfile.is_open()){
-		for (int i = 0; i < fileHolder.size(); ++i) {
-			outfile << fileHolder[i] << endl;
+
+	vector<string> keys = tempTable->keyParameters
+	std::vector<string> ;
+	string primaryKey = "";
+	// Sets primary key for new row
+	for (int j = 0; j < keys.size(); ++j) {
+		for (int k = 0; k < rowData.size(); ++k) {
+			if (keys[j].compare(rowData[k].attributeName) == 0) {
+				primaryKey += rowData[k]
+			}
 		}
 	}
-	outfile.close();
+	// Check if row data matches the type and name of the column they are inserted into
+	for (int j = 0; j < rowData.size(); ++j) {
+		if (!(rowData[j].attributeType.compare(attributes[j].attributeType) == 0 && 
+				rowData[j].attributeName.size() <= attributes[j].attributeSize)) {
+			// This will be an error
+			return;
+		}
+		else tempTable->addRow(primaryKey);
+	}
 }
 
-// Jennings' function
-// deletes specified row by content given or deletes entire table with '*' indicator
+/*
+-- DONE --
+Delete either a Row(s), Column(s), or entire Relationfile
+*/
 template <typename T>
-void DBengine::del(Relation* table, string colName, T rowToDel) {
-	vector<string> rows = table.getRows();
-	vector<attribute> attributesVect = table.attributes;
+void DBengine::del(string tableName, string colName, T rowToDel) {
+	for (int i = 0; i < tables.size(); ++i) {
+		if (tables[i]->getName() == tableName) {
+			Relation* tempTable = tables[i]
+			break;
+		}
+	}	
+	vector<Row> rows = tempTable->getRows();
 	// '*' signals to delete entire table
 	if (colName.compare('*') == 0 || rowToDel == '*') {
-		for (int i = 0; i < table.getSize(); ++i) {
-			table.deleteRow(j);
+		for (int i = 0; i < tempTable->getSize(); ++i) {
+			tempTable->deleteRow(i);
 		}
 	}
+	// Delete row matching colName and the info given.
 	else for (int j = 0; j < rows.size(); ++j) {
 		if (rows[j].get(colName) == rowToDel) {
-			table.deleteRow(j);
+			tempTable->deleteRow(j);
 		}
 	}
 }
 
-// Jennings' function
-template <typename T>
-void DBengine::update(Relation* table, int rowIndex, string colName, T whatToUpdate) {n
+/*
+-- DONE --
+Changes specified data whether it be a certain cell, row, or column
+*/
+bool DBengine::update(string tableName, int rowIndex, string colName, T whatToUpdate) {
+	for (int i = 0; i < tables.size(); ++i) {
+		if (tables[i]->getName() == tableName) {
+			Relation* tempTable = tables[i]
+			break;
+		}
+	}
 	Row changedRow = table.getRow(rowIndex);
 	if (changedRow.set(colName, whatToUpdate)) {
 		return true;
-	}          
-	else return false;
+	}
 }
 
 // Cody's functions

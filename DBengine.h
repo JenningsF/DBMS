@@ -256,21 +256,21 @@ class DBengine {
 			myfile.close();
 		}
 		// Opens .db file, loads into tables
-		bool open(string name);
+		bool open(string fileName);
 		// Closes myfile filestream
-		bool close();
-		void exit();
-		void write(string tableName);
-		void show(string filename);
+		bool close(string fileName);
+		void exitEngine();
+		void write(string fileName);
+		void show(string tableName);
 		// Sets table to relation specified by argument name
-		void select(string tableName);
+		Relation* select(string tableName, vector<string> colNames, char allTableIndicator);
 		void output();
-		void create(string fileName, vector<attribute> attrVect, vector<string> primaryKey);
-		void insert(string tableName, attribute newAttr);
+		void create(string tableName, vector<attribute> attrVect, vector<string> primaryKeys);
+		void insert(string tableName, int insertIndicator, vector);
 		template <typename T>
-		void del(Relation* table, string colName, T rowToDel);
+		void del(string tableName, string colName, T rowToDel);
 		template <typename T>
-		void update(Relation* table, int rowIndex, string colName, T whatToUpdate);
+		bool update(string tableName, int rowIndex, string colName, T whatToUpdate);
 };
 
 #endif
