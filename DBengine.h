@@ -29,12 +29,21 @@ struct attribute {
 	string attributeName;
 	string attributeType;
 	int attributeSize;
+	string entryData;
 	bool isPk;
 	attribute() : attributeName(""), attributeType(""),
 		attributeSize(0), isPk(false) {}
 	attribute(string name, string type, bool pk, int size = 0) {
 		attributeName = name;
 		attributeType = type;
+		isPk = pk;
+		attributeSize = size;
+	};
+	// Constructor for use of inserting Row
+	attribute(string name, string type, string data, bool pk, int size = 0) {
+		attributeName = name;
+		attributeType = type;
+		entryData = data;
 		isPk = pk;
 		attributeSize = size;
 	};
@@ -67,156 +76,60 @@ class Relation {
 		// Column attributes
 		vector<attribute> attributes;
 		// Constructors
-		Relation() : name("") {}
-		Relation(string n, vector<attribute> attribs = vector<attribute>()) {
-			 name = n;
-			 attributes = attribs;
-			 size = 0;
-		}
+		Relation();
+		Relation(string n, vector<attribute> attribs);
 		// Getter functions
-		string getName() {return name;}
-		int getSize() { return size; }
-		int getColumnSize() { return colSize; }
-		vector<string> getColumnNames() { return columnNames; }
-		const vector<Row> getRows() { return rows; }
+		string getName();
+		int getSize();
+		int getColumnSize();
+		vector<string> getColumnNames();
+		const vector<Row> getRows();
 		Row getRow(int i);
 		// Setter functions
-		void setName(string n) {name = n;}
-		void setAttributes(vector<attribute> attribs) { 
-			attributes = attribs; 
-			colSize = attribs.size();
-		}
-		void setKeyParameters(vector<string> keys) { keyParameters = keys; }
-		void setRows(vector<Row> r) {
-			rows = r;
-			size = rows.size();
-		}
-		void setColumnNames() {
-			for (int i = 0; i < attributes.size(); ++i) {
-				columnNames.push_back(attributes[i].attributeName);
-			}
-		}
+		void setName(string n);
+		void setAttributes(vector<attribute> attribs);
+		void setKeyParameters(vector<string> keys);
+		void setRows(vector<Row> r);
+		void setColumnNames();
 		// Add row to table
 		void addRow(string primary);
-		void addRow(Row r) {
-			bool exists = false;
-			for (int j = 0; j < rows.size(); ++j) {
-				if (rows[j].getPK() == r.getPK())
-					exists = true;
-				else continue;
-			}
-			if (!exists) {
-				rows.push_back(Row(this, r));
-				++size;
-			}			
-		}
-		void addRows(vector<Row> r) {
-			for (int i = 0; i < r.size(); ++i) {
-				addRow(r[i]);
-			}
-		}
-		void incrementSize() { ++size; }
+		void addRow(Row r);
+		void addRows(vector<Row> r);
+		void incrementSize();
 		// Add column to table
 		void addAttribute(attribute attrib);
 		// Remove row based on index
-		void deleteRow(int i) {
-			if (i < size) {
-				rows.erase(rows.begin() + i);
-				--size;
-			}
-			else throw RowNotFound();
-		}
+		void deleteRow(int i);
 };
+
 // Row class to make up relation
 class Row {
-private:
-	friend class Relation;
-	string PK;
-	vector<string> columns;
-	vector<string> columnNames;
-	const Relation* table;
-public:
-
-	// Constructor
-	Row(const Relation* tab, string primary = "",
-		vector<string> cols = vector<string>())
-	{
-		table = tab;
-		PK = primary;
-		columnNames = cols;
-		columns = vector<string>(cols.size());
-	}
-
-	Row(const Relation* tab, Row r) {
-		table = tab;
-		PK = r.PK;
-		columnNames = r.columnNames;
-		columns = r.columns;
-	}
-
-	// Gets index of data related to Column Name
-	int findIndex(string colName) {
-		for (int i = 0; i < columnNames.size(); ++i) {
-			if (columnNames[i] != colName)
-				continue;
-			return i;
-		}
-		return -1; // Not found
-	}
-
-	// Get data from Row
-	template <typename T>
-	T get(string colName) {
-		int index = findIndex(colName);
-		if (columns.size() > index && index != -1) {
-			if (table->attributes[index].attributeType == "string")
-				return columns[index];
-			else if (table->attributes[index].attributeType == "int")
-				return atoi(columns[index].c_str());
-			else if (table->attributes[index].attributeType == "double")
-				return atof(columns[index].c_str());
-		}
-		else throw ColumnNotFound();
-	}
-
-	// Get Primary Key
-	string getPK() { return PK; }
-
-	// Sets column data
-	template <typename T>
-	bool set(string colName, T data) {
-		int index = findIndex(colName);
-		// Ensures columnName and columns vectors are same size
-		if (columns.size() > index && index != -1) {
-			stringstream buffer;
-			// Make data a string for storing
-			buffer << data;
-			// Ensure it complies with data size spec.
-			if (table->attributes[index].attributeType == "string" &&
-				table->attributes[index].attributeSize < buffer.str().size())
-				return false;
-
-			columns[index] = buffer.str();
-		}
-		else return false;
-
-		return true;
-	}
-
-	void setTable(Relation* t) {
-		table = t;
-	}
-
-	// For outputting to .db file
-	const string operator[](int i) { 
-		if (i >= 0 && i < columns.size()) 
-			return columns[i]; 
-		else throw DataNotFound();
-	}
-
-	// Getters of columns and column names
-	const vector<string> getColumns() { return columns; }
-	const vector<string> getColumnNames() { return columnNames; }
+	private:
+		friend class Relation;
+		string PK;
+		vector<string> columns;
+		vector<string> columnNames;
+		const Relation* table;
+	public:
+		// Constructors
+		Row(const Relation* tab, string primary, vector<string> cols);
+		Row(const Relation* tab, Row r);
+		// Gets index of data related to Column Name
+		int findIndex(string colName);
+		// Get data from Row
+		template <typename T>
+		T get(string colName);
+		// Get Primary Key
+		string getPK();
+		// Sets column data
+		template <typename T>
+		bool set(string colName, T data);
+		void setTable(Relation* t);
+		// For outputting to .db file
+		const string operator[](int i);
+		// Getters of columns and column names
+		const vector<string> getColumns();
+		const vector<string> getColumnNames();
 };
 
 // Function to scan first line of .db file
@@ -232,16 +145,16 @@ ostream& operator<<(ostream& out, Relation& table);
 istream& operator>>(istream& in, Relation& table);
 
 // Overloaded equality operator for rows
-bool operator==(const Row& lrow, const Row& rrow);
+bool operator==(Row& lrow, Row& rrow);
 
 // Overloaded equality operator for attribute
 bool operator==(const attribute& lattr, const attribute& rattr);
 
 // Overloaded set union operator for relation
-Relation operator+(Relation& ltable, Relation& rtable);
+Relation* operator+(Relation& ltable, Relation& rtable);
 
 // Overloaded set difference operator for relation
-Relation operator-(Relation& ltable, Relation& rtable);
+Relation* operator-(Relation& ltable, Relation& rtable);
 
 class DBengine {
 	private:
@@ -260,13 +173,14 @@ class DBengine {
 		// Closes myfile filestream
 		bool close(string fileName);
 		void exitEngine();
-		void write(string fileName);
+		bool write(string fileName);
 		void show(string tableName);
 		// Sets table to relation specified by argument name
+		template <typename T>
 		Relation* select(string tableName, vector<string> colNames, char allTableIndicator);
 		void output();
 		void create(string tableName, vector<attribute> attrVect, vector<string> primaryKeys);
-		void insert(string tableName, int insertIndicator, vector);
+		void insert(string tableName, vector<attribute> rowData);
 		template <typename T>
 		void del(string tableName, string colName, T rowToDel);
 		template <typename T>

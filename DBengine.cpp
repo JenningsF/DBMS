@@ -13,6 +13,176 @@
 #include "DBengine.h"
 
 using namespace std;
+/*********************************************************
+					Relation Functions
+*********************************************************/
+
+// Constructors
+Relation::Relation() : name("") {}
+Relation::Relation(string n, vector<attribute> attribs = vector<attribute>()) {
+	 name = n;
+	 attributes = attribs;
+	 size = 0;
+}
+
+// Getter functions
+string Relation::getName() { return name; }
+int Relation::getSize() { return size; }
+int Relation::getColumnSize() { return colSize; }
+vector<string> Relation::getColumnNames() { return columnNames; }
+const vector<Row> Relation::getRows() { return rows; }
+Row Relation::getRow(int i) { 
+	if (i < size)
+		return rows[i];
+	else throw RowNotFound();
+}
+
+// Setter functions
+void Relation::setName(string n) { name = n; }
+void Relation::setAttributes(vector<attribute> attribs) { 
+	attributes = attribs; 
+	colSize = attribs.size();
+}
+void Relation::setKeyParameters(vector<string> keys) { keyParameters = keys; }
+void Relation::setRows(vector<Row> r) {
+	rows = r;
+	size = rows.size();
+}
+void Relation::setColumnNames() {
+	for (int i = 0; i < attributes.size(); ++i) {
+		columnNames.push_back(attributes[i].attributeName);
+	}
+}
+// Add row to table
+void Relation::addRow(string primary) {
+	rows.push_back(Row(this, primary, columnNames));
+	++size;
+}
+void Relation::addRow(Row r) {
+	bool exists = false;
+	for (int j = 0; j < rows.size(); ++j) {
+		if (rows[j].getPK() == r.getPK())
+			exists = true;
+		else continue;
+	}
+	if (!exists) {
+		rows.push_back(Row(this, r));
+		++size;
+	}			
+}
+void Relation::addRows(vector<Row> r) {
+	for (int i = 0; i < r.size(); ++i) {
+		addRow(r[i]);
+	}
+}
+void Relation::incrementSize() { ++size; }
+// Add column to table
+void Relation::addAttribute(attribute attrib) {
+	attributes.push_back(attrib);
+	columnNames.push_back(attrib.attributeName);
+	++colSize;
+	for (int i = 0; i < rows.size(); ++i) {
+		rows[i].columnNames.push_back(attrib.attributeName);
+		rows[i].columns.push_back("");
+	}
+}
+// Remove row based on index
+void Relation::deleteRow(int i) {
+	if (i < size) {
+		rows.erase(rows.begin() + i);
+		--size;
+	}
+	else throw RowNotFound();
+}
+
+/*********************************************************
+					Row Functions
+*********************************************************/
+
+// Constructors
+Row::Row(const Relation* tab, string primary = "",
+	vector<string> cols = vector<string>()) {
+	table = tab;
+	PK = primary;
+	columnNames = cols;
+	columns = vector<string>(cols.size());
+}
+
+Row::Row(const Relation* tab, Row r) {
+	table = tab;
+	PK = r.PK;
+	columnNames = r.columnNames;
+	columns = r.columns;
+}
+
+// Gets index of data related to Column Name
+int Row::findIndex(string colName) {
+	for (int i = 0; i < columnNames.size(); ++i) {
+		if (columnNames[i] != colName)
+			continue;
+		return i;
+	}
+	return -1; // Not found
+}
+
+// Get data from Row
+template <typename T>
+T Row::get(string colName) {
+	int index = findIndex(colName);
+	if (columns.size() > index && index != -1) {
+		if (table->attributes[index].attributeType == "string")
+			return columns[index];
+		else if (table->attributes[index].attributeType == "int")
+			return atoi(columns[index].c_str());
+		else if (table->attributes[index].attributeType == "double")
+			return atof(columns[index].c_str());
+	}
+	else throw ColumnNotFound();
+}
+
+// Get Primary Key
+string Row::getPK() { return PK; }
+
+// Sets column data
+template <typename T>
+bool Row::set(string colName, T data) {
+	int index = findIndex(colName);
+	// Ensures columnName and columns vectors are same size
+	if (columns.size() > index && index != -1) {
+		stringstream buffer;
+		// Make data a string for storing
+		buffer << data;
+		// Ensure it complies with data size spec.
+		if (table->attributes[index].attributeType == "string" &&
+			table->attributes[index].attributeSize < buffer.str().size())
+			return false;
+
+		columns[index] = buffer.str();
+	}
+	else return false;
+
+	return true;
+}
+
+// Sets the row's parent table
+void Row::setTable(Relation* t) {
+	table = t;
+}
+
+// For outputting to .db file
+const string Row::operator[](int i) { 
+	if (i >= 0 && i < columns.size()) 
+		return columns[i]; 
+	else throw DataNotFound();
+}
+
+// Getters of columns and column names
+const vector<string> Row::getColumns() { return columns; }
+const vector<string> Row::getColumnNames() { return columnNames; }
+
+/*********************************************************
+					DBengine Functions
+*********************************************************/
 
 /*
 -- DONE --
@@ -22,7 +192,7 @@ bool DBengine::open(string fileName) {
 	ifstream myfile;
 	string fileExtension = fileName.substr(fileName.size() - 3, 3);
 	if (fileExtension.compare(".db") != 0) {	// Checks is file extension exists
-		fileName += ".db";			// If it doesn't, adds '.db' extension
+		fileName += ".db";						// If it doesn't, adds '.db' extension
 	}
 
 	myfile.open(fileName.c_str());
@@ -41,15 +211,15 @@ Calls write function then closes the file and deletes from the vector of Relatio
 */
 bool DBengine::close(string fileName) {
 	string fileExtension = fileName.substr(fileName.size() - 3, 3);
-	if (fileExtension.compare(".db") == 0) {	// Checks is file extension exists
-		fileName.erase(filename.size() - 4, 3);			// If it does, delete '.db' extension
+	if (fileExtension.compare(".db") == 0) {		// Checks is file extension exists
+		fileName.erase(fileName.size() - 4, 3);		// If it does, delete '.db' extension
 	}
 	write(fileName);
 	for (int i = 0; i < tables.size(); ++i) {
 		string relationName = tables[i]->getName();
-		if(relationName == tableName) {
+		if(relationName == fileName) {
 			delete tables[i];
-			vector<Relation>::iterator iter = tables.begin() + i;
+			vector<Relation*>::iterator iter = tables.begin() + i;
 			tables.erase(iter);
 		}
 	}
@@ -74,9 +244,9 @@ Opens the file, writes changes made to the Relation, and then closes the file th
 */
 bool DBengine::write(string fileName) {
 	ofstream outfile;
-	string fileExtension = fileName.substr(fileName.size() - 3, 3);x
+	string fileExtension = fileName.substr(fileName.size() - 3, 3);
 	if (fileExtension.compare(".db") != 0) {	// Checks is file extension exists
-		string fileName = name + ".db";			// If it doesn't, adds '.db' extension
+		string fileName = fileName + ".db";			// If it doesn't, adds '.db' extension
 	}
 
 	outfile.open(fileName.c_str(), ios_base::app);
@@ -111,10 +281,12 @@ void DBengine::show(string tableName) {
 Selects a portion or an entire Relation and creates a view with selected data
 Note: Does not create file unless create/write function is called
 */
+template <typename T>
 Relation* DBengine::select(string tableName, vector<string> colNames, char allTableIndicator) {
+	Relation* tempTable;
 	for (int i = 0; i < tables.size(); ++i) {
 		if (tables[i]->getName() == tableName) 
-			Relation* tempTable = tables[i];
+			tempTable = tables[i];
 	}
 	if (allTableIndicator == '*') {
 		Relation* wholeTable = new Relation(tempTable->getName(), tempTable->attributes);
@@ -127,20 +299,22 @@ Relation* DBengine::select(string tableName, vector<string> colNames, char allTa
 		// Iterate through both column name vectors to find matches
 		for (int j = 0; j < colNames.size(); ++j) {
 			for (int k = 0; k < tempAttributes.size(); ++k) {
-				if (colNames[j].compare(tempAttributes[k]->attributeName) == 0) {
+				if (colNames[j].compare(tempAttributes[k].attributeName) == 0) {
 					newAttributes.push_back(tempAttributes[k]);
 				}
 			}
 		}
 		Relation* newRel = new Relation(tableName, newAttributes);
-		newRel.setColumnNames();
-		newRel.setRows(rows);
+		newRel->setColumnNames();
+		newRel->setRows(rows);
 		vector<Row> newRows = newRel->getRows();
-		vector<string> newColumns = newRel.getColumnNames();
+		vector<string> newColumns = newRel->getColumnNames();
 		// Sets row data
-		for (int m = 0; m < newRel.getColumnSize(); ++m) {
-			for (int n = 0; n < newRel.getSize(); ++n) {
-				newRows[l].set(newColumns[m], rows[n].get(newColumns[m]));
+		for (int m = 0; m < newRel->getColumnSize(); ++m) {
+			for (int n = 0; n < newRel->getSize(); ++n) {
+				//T data = rows[n].get(newColumns[m]);
+				string data = string(rows[n].get<string>(newColumns[m]));
+				newRows[n].set(newColumns[m], data);
 			}
 		}
 		return newRel;
@@ -160,8 +334,8 @@ Initilizes a Relation object, then pushes back on tables vector
 */
 void DBengine::create(string tableName, vector<attribute> attrVect, vector<string> primaryKeys) {
 	Relation* rel = new Relation(tableName, attrVect);
-	rel.setKeyParameters(primaryKeys);
-	rel.setColumnNames();
+	rel->setKeyParameters(primaryKeys);
+	rel->setColumnNames();
 	tables.push_back(rel);
 }
 
@@ -170,21 +344,22 @@ void DBengine::create(string tableName, vector<attribute> attrVect, vector<strin
 Insert a Row into a Relation
 */
 void DBengine::insert(string tableName, vector<attribute> rowData) {
+	Relation* tempTable;
 	for (int i = 0; i < tables.size(); ++i) {
 		if (tables[i]->getName() == tableName) {
-			Relation* tempTable = tables[i]
+			tempTable = tables[i];
 			break;
 		}
 	}
 
-	vector<string> keys = tempTable->keyParameters
-	std::vector<string> ;
+	vector<string> keys = tempTable->keyParameters;
+	vector<attribute> attributes = tempTable->attributes;
 	string primaryKey = "";
 	// Sets primary key for new row
 	for (int j = 0; j < keys.size(); ++j) {
 		for (int k = 0; k < rowData.size(); ++k) {
 			if (keys[j].compare(rowData[k].attributeName) == 0) {
-				primaryKey += rowData[k]
+				primaryKey += rowData[k].entryData;
 			}
 		}
 	}
@@ -205,22 +380,24 @@ Delete either a Row(s), Column(s), or entire Relationfile
 */
 template <typename T>
 void DBengine::del(string tableName, string colName, T rowToDel) {
+	Relation* tempTable;
 	for (int i = 0; i < tables.size(); ++i) {
 		if (tables[i]->getName() == tableName) {
-			Relation* tempTable = tables[i]
+			tempTable = tables[i];
 			break;
 		}
 	}	
 	vector<Row> rows = tempTable->getRows();
 	// '*' signals to delete entire table
-	if (colName.compare('*') == 0 || rowToDel == '*') {
+	if (colName.compare("*") == 0 || rowToDel == "*") {
 		for (int i = 0; i < tempTable->getSize(); ++i) {
 			tempTable->deleteRow(i);
 		}
 	}
 	// Delete row matching colName and the info given.
 	else for (int j = 0; j < rows.size(); ++j) {
-		if (rows[j].get(colName) == rowToDel) {
+		string data = string(rows[j].get<string>(colName));
+		if (data == rowToDel) {
 			tempTable->deleteRow(j);
 		}
 	}
@@ -230,14 +407,15 @@ void DBengine::del(string tableName, string colName, T rowToDel) {
 -- DONE --
 Changes specified data whether it be a certain cell, row, or column
 */
+template <typename T>
 bool DBengine::update(string tableName, int rowIndex, string colName, T whatToUpdate) {
 	for (int i = 0; i < tables.size(); ++i) {
 		if (tables[i]->getName() == tableName) {
-			Relation* tempTable = tables[i]
+			Relation* tempTable = tables[i];
 			break;
 		}
 	}
-	Row changedRow = table.getRow(rowIndex);
+	Row changedRow = table->getRow(rowIndex);
 	if (changedRow.set(colName, whatToUpdate)) {
 		return true;
 	}
@@ -275,8 +453,8 @@ ostream& operator<<(ostream& out, Relation& table) {
 
 
 // Overloaded equality operator for rows
-bool operator==(const Row& lrow, const Row& rrow) {
-	if (lrow.getPK() == rrow.getPK() && lrow.getColmns() == rrow.getColmns()
+bool operator==(Row& lrow, Row& rrow) {
+	if (lrow.getPK() == rrow.getPK() && lrow.getColumns() == rrow.getColumns()
 		&& lrow.getColumnNames() == rrow.getColumnNames())
 		return true;
 	else return false;
@@ -314,7 +492,7 @@ Relation* operator-(Relation& ltable, Relation& rtable) {
 		Relation* table = new Relation("", ltable.attributes);
 		table->addRows(ltable.getRows());
 		for (int i = 0; i < rtable.getSize(); ++i) {
-			for (int j = 0; j < table.getSize(); ++j) {
+			for (int j = 0; j < table->getSize(); ++j) {
 				if (rtable.getRow(i).getPK() == table->getRow(j).getPK()) {
 					table->deleteRow(j);
 					break;
@@ -325,30 +503,6 @@ Relation* operator-(Relation& ltable, Relation& rtable) {
 		return table;
 	}
 	else return NULL;
-}
-
-// Relation Function Definitions
-Row Relation::getRow(int i) { 
-	if (i < size)
-		return rows[i];
-	else throw RowNotFound();
-}
-
-// Add row to table
-void Relation::addRow(string primary) {
-	rows.push_back(Row(this, primary, columnNames));
-	++size;
-}
-
-// Add column to table
-void Relation::addAttribute(attribute attrib) {
-	attributes.push_back(attrib);
-	columnNames.push_back(attrib.attributeName);
-	++colSize;
-	for (int i = 0; i < rows.size(); ++i) {
-		rows[i].columnNames.push_back(attrib.attributeName);
-		rows[i].columns.push_back("");
-	}
 }
 
 // Input operator loads a relation from input file
@@ -418,4 +572,9 @@ vector<string> DefineKey(stringstream& data) {
 		keys.push_back(parameter);
 	}
 	return keys;
+}
+
+int main(int argc, char const *argv[])
+{
+	return 0;
 }
