@@ -24,17 +24,6 @@ string_command hashit(string const& inString);
 enum string_type{eChar, eInt};
 string_type hashtype(string const& inString);
 
-//move to new header file
-struct element {
-	string viewName;
-	string fromName;
-	string_command command;
-	string query_type;
-	string column;
-	string value;
-	vector<string> attributes;
-};
-
 // Attribute struct to hold column properties
 struct attribute {
 	string attributeName;
@@ -68,6 +57,18 @@ struct attribute {
 		attributeSize = a.attributeSize;
 		isPk = a.isPk;
 	}
+};
+
+
+struct element {
+	string viewName;
+	string fromName;
+	string_command command;
+	string query_type;
+	string column;
+	string value;
+	vector<string> attributes;
+	vector<attribute> attribs;
 };
 
 #endif
