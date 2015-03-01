@@ -198,7 +198,6 @@ const vector<string> Row::getColumnNames() { return columnNames; }
 *********************************************************/
 
 /*
--- DONE --
 Open file and read into vector of Relations and then close file
 */
 bool DBengine::open(string fileName) {
@@ -219,7 +218,6 @@ bool DBengine::open(string fileName) {
 }
 
 /*
--- DONE --
 Calls write function then closes the file and deletes from the vector of Relations
 */
 bool DBengine::close(string fileName) {
@@ -240,7 +238,6 @@ bool DBengine::close(string fileName) {
 }
 
 /*
--- DONE --
 Iterates through vector of Relations and calls close on all relations
 that are being used and then exits the program
 */
@@ -253,7 +250,6 @@ void DBengine::exitEngine() {
 }
 
 /*
--- DONE --
 Opens the file, writes changes made to the Relation, and then closes the file that was opened
 */
 bool DBengine::write(string fileName) {
@@ -279,7 +275,6 @@ bool DBengine::write(string fileName) {
 
 
 /*
--- DONE --
 Prints out table that is passed as an argument
 */
 void DBengine::show(string tableName) {
@@ -291,7 +286,6 @@ void DBengine::show(string tableName) {
 }
 
 /*
--- DONE --
 Selects a portion or an entire Relation and creates a view with selected data
 Note: Does not create file unless create/write function is called
 */
@@ -343,7 +337,6 @@ void DBengine::output() {
 }
 
 /*
--- DONE --
 Initilizes a Relation object, then pushes back on tables vector
 */
 void DBengine::create(string tableName, vector<attribute> attrVect, vector<string> primaryKeys) {
@@ -354,7 +347,6 @@ void DBengine::create(string tableName, vector<attribute> attrVect, vector<strin
 }
 
 /*
--- DONE --
 Insert a Row into a Relation
 */
 void DBengine::insert(string tableName, vector<attribute> rowData) {
@@ -389,7 +381,6 @@ void DBengine::insert(string tableName, vector<attribute> rowData) {
 }
 
 /*
--- DONE --
 Delete either a Row(s), Column(s), or entire Relationfile
 */
 template <typename T>
@@ -418,7 +409,6 @@ void DBengine::del(string tableName, string colName, T rowToDel) {
 }
 
 /*
--- DONE --
 Changes specified data whether it be a certain cell, row, or column
 */
 template <typename T>
@@ -435,7 +425,6 @@ bool DBengine::update(string tableName, int rowIndex, string colName, T whatToUp
 	}
 }
 
-// Cody's functions
 // Output operator outputs relation to specified .db format
 ostream& operator<<(ostream& out, Relation& table) {
 	// List attribute name type (size if string) 
