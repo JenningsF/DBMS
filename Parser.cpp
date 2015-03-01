@@ -77,23 +77,23 @@ void Parser::parse_command(){
 		parse_create();
 		break;
 	case eInsert:
-		cout << "Call insert for: " << l << endl;
+		cout << "Call insert for: " << line << endl;
 		cin >> pause;
-		l.erase(0, l.find("INTO ") + 5);
-		parse_insert(l);
+		line.erase(0, line.find("INTO ") + 5);
+		parse_insert(line);
 		break;
 	case eShow:
-		relation_name = l.substr(0, l.find(' '));
+		relation_name = line.substr(0, line.find(' '));
 		cout << "Call show for relation: " << relation_name << endl;
 		cin >> pause;
 		break;
 	case eWrite:
-		relation_name = l.substr(0, l.find(' '));
+		relation_name = line.substr(0, line.find(' '));
 		cout << "Call write to table name: " << relation_name << endl;
 		cin >> pause;
 		break;
 	case eClose:
-		relation_name = l.substr(0, l.find(' '));
+		relation_name = line.substr(0, line.find(' '));
 		cout << "Call close for file: " << relation_name << endl;
 		cin >> pause;
 		break;
@@ -297,7 +297,7 @@ void Parser::parse_create(){
 	//Parse primary key
 	size_t pos = line.find('(');
 	if(pos == string::npos) {
-		printf("Error: failed to provide Primary Key\n");
+		cout << "Error: failed to provide Primary Key\n";
 		return;
 	}
 	pos += 1;
