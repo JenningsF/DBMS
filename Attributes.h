@@ -26,11 +26,13 @@ string_type hashtype(string const& inString);
 
 //move to new header file
 struct element {
+	string viewName;
+	string fromName;
+	string_command command;
 	string query_type;
 	string column;
 	string value;
 	vector<string> attributes;
-	
 };
 
 // Attribute struct to hold column properties

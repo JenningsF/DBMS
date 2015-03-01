@@ -39,17 +39,6 @@ string_command Parser::getCommand() {
 	return command;
 }
 
-string Parser::getTableName() {
-	return tableName;
-}
-
-vector<attribute> Parser::getAttributes() {
-	return attrVect;
-}
-
-vector<string> Parser::getPrimaryKeys() {
-	return primaryKeys;
-}
 
 //------------------------------------------------------------------------------------------------------
 //Parser:: parse(string l)
@@ -58,40 +47,45 @@ void Parser::parse(string l){
 	line = l;
 	string temp = line.substr(0, line.find(' '));
 	if (temp == "CREATE" || temp == "OPEN" || temp == "INSERT" || temp == "SHOW" || temp == "WRITE" || temp == "CLOSE" || temp == "EXIT")
-		parse_command();
+		parse_command(line);
 	else parse_query();
 }
 
 //--------------------------------------------------------------------------------------------------------
 //Parser:: parse_command(string l)
-void Parser::parse_command(){
-	string temp = line.substr(0, line.find(' '));
-	size_t delim = line.find(' ') + 1;
-	line.erase(0, delim);
+
+void Parser::parse_command(string l){
+	string temp = l.substr(0, l.find(' '));
+	size_t delim = l.find(' ') + 1;
+	l.erase(0, delim);
 	string relation_name, pause;
 	string_command command = hashit(temp);
 	switch (command){
-	case eCreate: //good
-		delim = line.find(' ') + 1; //erase TABLE before calling parse_create
-		line.erase(0, delim);
-		parse_create();
+	case eCreate:
+		cout << "Call create for: " << l << endl;
+		cin >> pause;
+		delim = l.find(' ') + 1; //erase TABLE before calling parse_create
+		l.erase(0, delim);
+		parse_create(l);
 		break;
 	case eInsert:
-		cout << "Call insert for: " << line << endl;
+		cout << "Call insert for: " << l << endl;
 		cin >> pause;
-		line.erase(0, line.find("INTO ") + 5);
-		parse_insert(line);
+		l.erase(0, l.find("INTO ") + 5);
+		parse_insert(l);
 		break;
 	case eShow:
-		relation_name = line.substr(0, line.find(' '));
+		relation_name = l.substr(0, l.find(' '));
 		cout << "Call show for relation: " << relation_name << endl;
 		cin >> pause;
 		break;
-	case eWrite: //good
-		relation_name = line.substr(0, line.find('\0'));
+	case eWrite:
+		relation_name = l.substr(0, l.find(' '));
+		cout << "Call write to table name: " << relation_name << endl;
+		cin >> pause;
 		break;
 	case eClose:
-		relation_name = line.substr(0, line.find(' '));
+		relation_name = l.substr(0, l.find(' '));
 		cout << "Call close for file: " << relation_name << endl;
 		cin >> pause;
 		break;
@@ -107,8 +101,45 @@ void Parser::parse_command(){
 	}
 }
 
+
 //-------------------------------------------------------------------------------------------------------
 //void parse_type(string l, vector<attribute> attrVector, vector<string> primaryKey)
+void parse_type(string l, vector<string> primaryKey){
+
+	while (l.size() > 2){
+		string temp_type, temp_name;
+		int temp_size;
+		temp_name = l.substr(0, l.find(' ')); //get the name for attribute
+		l.erase(0, l.find(' ') + 1);
+		temp_type = l.substr(0, l.find('R') + 1);//all the types end with R
+		string_type type = hashtype(temp_type);
+
+		switch (type){ //switch the type for attribute
+		case eChar:
+			temp_type = "Char";
+			l.erase(0, l.find('(') + 1);//erase up to '(' before size
+			temp_size = atoi(l.substr(0, l.find(')')).c_str());
+			//attribute temp_attr(temp_name, temp_type, 0, temp_size);
+			primaryKey.push_back(temp_name);
+			cout << "Parsed attribute name:" << temp_name << " type: " << temp_type << " size:" << temp_size << endl;
+			l.erase(0, l.find(')') + 3);
+			break;
+		case eInt:
+			temp_type = "Int";
+			cout << "Parsed attribute name:" << temp_name << " type: " << temp_type << endl;
+			l.erase(0, l.find(')') + 1);
+			break;
+		default:
+			cout << "Something went wrong in parse_type switch(type)\n";
+		}
+	}
+	cout << "Primary key holds: ";
+	for (int i = 0; i < primaryKey.size(); i++)
+	{
+		cout << primaryKey[i] << " ";
+	}
+	cout << endl;
+}
 
 //--------------------------------------------------------------------------------------------------------
 //Parser::parse_query
@@ -235,95 +266,21 @@ void Parser::parse_query() {
 }
 //--------------------------------------------------------------------------------------------------------------------
 //Parser:: parse_create(string l)
+void Parser::parse_create(string l){
 
-void convertType(string &type) {
-	if(type == "VARCHAR" || type == "varchar") {
-		type = "string";
-	}
-	else if(type == "INTEGER" || type == "integer") {
-		type = "int";
-	}
-	else if(type == "DOUBLE" || type == "double") {
-		type = "double";
-	}
-	return;
-}
+	//vector<attribute> attrVect;
+	vector<string> primaryKey;
 
-void Parser::parse_create(){
-	//size_t pos = line.find('(') + 1;
-	//string relation_name, typed_attribute_list, attribute_list;
-	//Temp Variables
-	string name, type;
-	int size = 0;
-	//Parser
-	bool isDone = false;
-	while(!isDone) {
-		size_t pos = line.find(' ');
-		tableName = line.substr(0, pos);
-		line.erase(0, pos + 2); //erase tableName from line and first '('
-		pos = line.find(' ');
-		name = line.substr(0,pos); //attribute name
-		line.erase(0, pos + 1);
-		pos = line.find(' ');
-		if(line.substr(pos-2, pos-1) == ")") {//case for when there is a specified sized
-			pos = line.find('(');
-			type = line.substr(0,pos);
-			convertType(type);
-			line.erase(0, pos + 1);
-			pos = line.find(')');
-			size = atoi(line.substr(0,pos).c_str());
-			pos += 3;
-			line.erase(0, pos);
-		}
-		else if(line.substr(pos-1, pos) == ",") { //list continues
-			type = line.substr(0, pos - 1);
-			convertType(type);
-			pos += 1;
-			line.erase(0, pos);
-		}
-		else if(line.substr(pos-1,pos) == ")") { //list ends
-			type = line.substr(0, pos - 1);
-			convertType(type);
-			pos += 1;
-			line.erase(0, pos);
-			isDone = true;
-		}
-		//create and insert attribute
-		attribute temp(name, type, false, size);
-		attrVect.push_back(temp);
-	}
-	//Parse primary key
-	size_t pos = line.find('(');
-	if(pos == string::npos) {
-		cout << "Error: failed to provide Primary Key\n";
-		return;
-	}
-	pos += 1;
-	line.erase(0, pos);
-	isDone = false;
-	while(!isDone) {
-		string key;
-		if((pos = line.find(',')) == string::npos) {
-			pos = line.find(')');
-			key = line.substr(0, pos);
-			line.erase(0, pos);
-			isDone = true;
-		}
-		else {
-			key = line.substr(0, pos);
-			pos += 2;
-			line.erase(0, pos);
-		}
-		primaryKeys.push_back(key);
-	}
-	//Assign primary key
-	for(int i = 0; i < primaryKeys.size(); ++i) {
-		for(int j = 0; j < attrVect.size(); ++j) {
-			if(attrVect[j].attributeName == primaryKeys[i]) {
-				attrVect[j].isPk = true;
-			}
-		}
-	}
+	size_t pos = l.find('(') + 1;
+	string relation_name, typed_attribute_list, attribute_list;
+	relation_name = l.substr(0, l.find(' '));
+	l.erase(0, pos); //erase everything up to and including '("'
+	string delimeter = ", ";
+	pos = 0;
+	typed_attribute_list = l.substr(0, l.find(" PRIMARY")) + "  ";
+	cout << "typed attribute list: " << typed_attribute_list << endl;
+	//parse_type(typed_attribute_list, attrVect, primaryKey);
+	parse_type(typed_attribute_list, primaryKey);
 }
 
 //--------------------------------------------------------------------------------------------------------------------
@@ -358,5 +315,3 @@ void Parser::parse_insert(string l){
 		//cout << expr << endl;
 	}
 }
-
-

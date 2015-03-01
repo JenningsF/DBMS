@@ -32,7 +32,7 @@ int Relation::getColumnSize() { return colSize; }
 vector<string> Relation::getColumnNames() { return columnNames; }
 const vector<Row> Relation::getRows() { return rows; }
 Row Relation::getRow(int i) { 
-	if (i < size)
+	if (i < size && i > -1)
 		return rows[i];
 	else throw RowNotFound();
 }
@@ -164,6 +164,19 @@ bool Row::set(string colName, T data) {
 	return true;
 }
 
+// Add Column
+void Row::addColumn(string name) {
+	columnNames.push_back(name);
+	columns.push_back("");
+}
+
+void Row::addColumns(vector<string> names) {
+	for (int i = 0; i < names.size(); ++i) {
+		columnNames.push_back(names[i]);
+		columns.push_back("");
+	}
+}
+
 // Sets the row's parent table
 void Row::setTable(Relation* t) {
 	table = t;
@@ -223,6 +236,7 @@ bool DBengine::close(string fileName) {
 			tables.erase(iter);
 		}
 	}
+	return true;
 }
 
 /*
@@ -344,7 +358,7 @@ void DBengine::create(string tableName, vector<attribute> attrVect, vector<strin
 Insert a Row into a Relation
 */
 void DBengine::insert(string tableName, vector<attribute> rowData) {
-	Relation* tempTable;
+	Relation* tempTable = NULL;
 	for (int i = 0; i < tables.size(); ++i) {
 		if (tables[i]->getName() == tableName) {
 			tempTable = tables[i];
@@ -503,6 +517,28 @@ Relation* operator-(Relation& ltable, Relation& rtable) {
 		return table;
 	}
 	else return NULL;
+}
+
+// Overloaded cross product operator for relation
+Relation* operator*(Relation& ltable, Relation& rtable) {
+	vector<attribute> attribs = ltable.attributes;
+	for (int i = 0; i < rtable.attributes.size(); ++i) {
+		attribute temp_attrib = rtable.attributes[i];
+		temp_attrib.isPk = false;
+		attribs.push_back(temp_attrib);
+	}
+	Relation* table = new Relation("", attribs);
+	for (int j = 0; j < ltable.getSize(); ++j) {
+		for (int k = 0; k < rtable.getSize(); ++k) {
+			Row temp_row(table, ltable.getRow(j));
+			temp_row.addColumns(rtable.getRow(k).getColumnNames());
+			for (int l = 0; l < rtable.getRow(k).getColumns().size(); ++l) {
+				temp_row.set(rtable.getRow(k).getColumnNames()[l], rtable.getRow(k).getColumns()[l]);
+			}
+			table->addRow(temp_row);
+		}
+	}
+	return table;
 }
 
 // Input operator loads a relation from input file

@@ -21,22 +21,33 @@ int main(int argc, char const *argv[]) {
 		switch(parse.getCommand()) {
 			case eOpen:
 				DB.open(parse.getFromName());
+				break;
 			case eClose:
 				DB.close(parse.getFromName());
+				break;
 			case eInsert:
 		//		DB.insert(parse.getViewName(), parse.getRowData());
+				break;
 			case eCreate:
-				DB.create(parse.getTableName(), parse.getAttributes(), parse.getPrimaryKeys());
+		//		DB.create(parse.getFromName(), parse.getAttributes(), parse.getPrimaryKeys());
+				break;
 			case eWrite:
 				DB.write(parse.getFromName());
+				break;
 			case eExit:
 				DB.exitEngine();
+				break;
 			case eUpdate:
 		//		DB.update(parse.getViewName(), parse.getRowIndex(), parse.getColName(), parse.getData());
+				break;
 			case eDelete:
 		//		DB.del(parse.getViewName(), parse.getColName(), parse.getWhatToDel());
+				break;
 			case eShow:
 				DB.show(parse.getViewName());
+				break;
+			default:
+				break;
 		}
 		// if (parse.whatComm == eCreate)
 		// 	DB.create(parse.getFromName());

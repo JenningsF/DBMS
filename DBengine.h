@@ -86,6 +86,9 @@ class Row {
 		template <typename T>
 		bool set(string colName, T data);
 		void setTable(Relation* t);
+		// Adder
+		void addColumn(string name);
+		void addColumns(vector<string> names);
 		// For outputting to .db file
 		const string operator[](int i);
 		// Getters of columns and column names
