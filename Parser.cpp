@@ -271,7 +271,7 @@ void Parser::parse_create(){
 			convertType(type);
 			line.erase(0, pos + 1);
 			pos = line.find(')');
-			size = atoi(line.substr(0,pos));
+			size = atoi(line.substr(0,pos).c_str());
 			pos += 3;
 			line.erase(0, pos);
 		}
@@ -319,7 +319,7 @@ void Parser::parse_create(){
 	//Assign primary key
 	for(int i = 0; i < primaryKeys.size(); ++i) {
 		for(int j = 0; j < attrVect.size(); ++j) {
-			if(attrVect[j].name == primaryKeys[i]) {
+			if(attrVect[j].attributeName == primaryKeys[i]) {
 				attrVect[j].isPk = true;
 			}
 		}
