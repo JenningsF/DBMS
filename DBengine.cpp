@@ -574,7 +574,3 @@ vector<string> DefineKey(stringstream& data) {
 	return keys;
 }
 
-int main(int argc, char const *argv[])
-{
-	return 0;
-}

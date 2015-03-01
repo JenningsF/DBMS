@@ -21,10 +21,30 @@ string_type hashtype(string const& inString){
 	if (inString == "INTEGER") return eInt;
 }
 
+Parser::Parser() {
+	command = ERROR;
+}
+
+//------------------------------------------------------------------------------------------------------
+//Parser:: getViewName() 
+string Parser::getViewName() {
+	return viewName;
+}
+
+string Parser::getFromName() {
+	return fromName;
+}
+
+string_command Parser::getCommand() {
+	return command;
+}
+
+
 //------------------------------------------------------------------------------------------------------
 //Parser:: parse(string l)
 
-void Parser::parse(){
+void Parser::parse(string l){
+	line = l;
 	string temp = line.substr(0, line.find(' '));
 	if (temp == "CREATE" || temp == "OPEN" || temp == "INSERT" || temp == "SHOW" || temp == "WRITE" || temp == "CLOSE" || temp == "EXIT")
 		parse_command(line);
@@ -239,8 +259,7 @@ void Parser::parse_query() {
 			// Stores relation on left hand side
 			fromName = line.substr(0, pos);
 			line.erase(0,pos + 1);
-			// Stores which operation to perform
-			op = line[0];
+
 			line.erase(0, line.find(' ') + 1);
 		}
 	}

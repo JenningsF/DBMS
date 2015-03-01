@@ -6,32 +6,37 @@
 // Updated		: 11 February 2015
 // Description	: Database Engine where functions will be declared
 //********************************************************
+#include "DBengine.h"
+#include "Parser.h"
+#include <iostream>
+
+using namespace std;
 
 int main(int argc, char const *argv[]) {
 	DBengine DB;
 	Parser parse;
 	string temp;
-	while (cin.getline(temp)) {
+	while (getline(cin, temp)) {
 		parse.parse(temp);
-		switch() {
+		switch(parse.getCommand()) {
 			case eOpen:
 				DB.open(parse.getFromName());
 			case eClose:
 				DB.close(parse.getFromName());
 			case eInsert:
-				DB.insert(parse.getTableName(), parse.getRowData());
+		//		DB.insert(parse.getViewName(), parse.getRowData());
 			case eCreate:
-				DB.create(parse.getFromName(), parse.getAttributes(), parse.getPrimaryKeys());
+		//		DB.create(parse.getFromName(), parse.getAttributes(), parse.getPrimaryKeys());
 			case eWrite:
 				DB.write(parse.getFromName());
 			case eExit:
 				DB.exitEngine();
 			case eUpdate:
-				DB.update(parse.getTableName(), parse.getRowIndex(), parse.getColName(), parse.getData());
+		//		DB.update(parse.getViewName(), parse.getRowIndex(), parse.getColName(), parse.getData());
 			case eDelete:
-				DB.del(parse.getTableName(), parse.getColName(), parse.getWhatToDel());
+		//		DB.del(parse.getViewName(), parse.getColName(), parse.getWhatToDel());
 			case eShow:
-				Db.show(parse.getTableName());
+				DB.show(parse.getViewName());
 		}
 		// if (parse.whatComm == eCreate)
 		// 	DB.create(parse.getFromName());

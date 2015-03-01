@@ -1,24 +1,12 @@
 #include <string>
+#include <cstdlib>
 #include <iostream>
 #include <string>
 //Replace with new header file
-#include "DBengine.h"
+#include "Attributes.h"
 
 using namespace std;
 
-//move to new header file
-enum string_command{eOpen, eClose, eInsert, eCreate, eWrite, eExit, eUpdate, eDelete, eShow};
-string_command hashit(string const& inString);
-enum string_type{eChar, eInt};
-string_type hashtype(string const& inString);
-
-//move to new header file
-struct element {
-	string query_type;
-	string column;
-	string value;
-	vector<string> attributes;
-};
 
 class Parser {
 private:
@@ -27,7 +15,7 @@ private:
 	/*Parameters used for queries*/
 	string viewName;
 	string fromName;
-	char op;
+	string_command command;
 	vector<element> query;
 	/*Parameters used for queries and commands*/
 	
@@ -35,7 +23,11 @@ private:
 	
 public:
 	Parser();
-	~Parser();
+	// Getters
+	string getViewName();
+	string getFromName();
+	string_command getCommand();
+
 	//Add bool return
 	void parse(string line);
 	//Rewrite this function to utilize the line variable

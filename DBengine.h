@@ -16,48 +16,9 @@
 #include <sstream>
 #include <stdlib.h>
 #include <vector>
+#include "Attributes.h"
 
 using namespace std;
-
-// Error classes
-class ColumnNotFound{};
-class RowNotFound{};
-class DataNotFound{};
-
-// Attribute struct to hold column properties
-struct attribute {
-	string attributeName;
-	string attributeType;
-	int attributeSize;
-	string entryData;
-	bool isPk;
-	attribute() : attributeName(""), attributeType(""),
-		attributeSize(0), isPk(false) {}
-	attribute(string name, string type, bool pk, int size = 0) {
-		attributeName = name;
-		attributeType = type;
-		isPk = pk;
-		attributeSize = size;
-	};
-	// Constructor for use of inserting Row
-	attribute(string name, string type, string data, bool pk, int size = 0) {
-		attributeName = name;
-		attributeType = type;
-		entryData = data;
-		isPk = pk;
-		attributeSize = size;
-	};
-/*	attribute(string name, string type) : attributeSize(0), isPk(false) {
-		attributeName = name;
-		attributeType = type;
-	}*/
-	attribute(const attribute& a) {
-		attributeName = a.attributeName;
-		attributeType = a.attributeType;
-		attributeSize = a.attributeSize;
-		isPk = a.isPk;
-	}
-};
 
 class Row;
 
