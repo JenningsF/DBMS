@@ -71,7 +71,7 @@ void Parser::parse_command(){
 	string relation_name, pause;
 	string_command command = hashit(temp);
 	switch (command){
-	case eCreate:
+	case eCreate: //good
 		delim = line.find(' ') + 1; //erase TABLE before calling parse_create
 		line.erase(0, delim);
 		parse_create();
@@ -87,10 +87,8 @@ void Parser::parse_command(){
 		cout << "Call show for relation: " << relation_name << endl;
 		cin >> pause;
 		break;
-	case eWrite:
-		relation_name = line.substr(0, line.find(' '));
-		cout << "Call write to table name: " << relation_name << endl;
-		cin >> pause;
+	case eWrite: //good
+		relation_name = line.substr(0, line.find('\0'));
 		break;
 	case eClose:
 		relation_name = line.substr(0, line.find(' '));
