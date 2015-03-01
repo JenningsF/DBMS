@@ -26,7 +26,7 @@ int main(int argc, char const *argv[]) {
 			case eInsert:
 		//		DB.insert(parse.getViewName(), parse.getRowData());
 			case eCreate:
-		//		DB.create(parse.getFromName(), parse.getAttributes(), parse.getPrimaryKeys());
+				DB.create(parse.getTableName(), parse.getAttributes(), parse.getPrimaryKeys());
 			case eWrite:
 				DB.write(parse.getFromName());
 			case eExit:

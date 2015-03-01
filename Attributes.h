@@ -30,6 +30,7 @@ struct element {
 	string column;
 	string value;
 	vector<string> attributes;
+	
 };
 
 // Attribute struct to hold column properties
