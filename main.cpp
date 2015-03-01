@@ -19,35 +19,24 @@ int main(int argc, char const *argv[]) {
 	while (getline(cin, temp)) {
 		parse.parse(temp);
 		switch(parse.getCommand()) {
-			case eOpen:
+			case eOpen: //good
 				DB.open(parse.getFromName());
-				break;
-			case eClose:
+			case eClose: //good
 				DB.close(parse.getFromName());
-				break;
 			case eInsert:
 		//		DB.insert(parse.getViewName(), parse.getRowData());
-				break;
-			case eCreate:
-		//		DB.create(parse.getFromName(), parse.getAttributes(), parse.getPrimaryKeys());
-				break;
-			case eWrite:
+			case eCreate: //good
+				DB.create(parse.getTableName(), parse.getAttributes(), parse.getPrimaryKeys());
+			case eWrite: //good
 				DB.write(parse.getFromName());
-				break;
-			case eExit:
+			case eExit: //good
 				DB.exitEngine();
-				break;
 			case eUpdate:
 		//		DB.update(parse.getViewName(), parse.getRowIndex(), parse.getColName(), parse.getData());
-				break;
 			case eDelete:
 		//		DB.del(parse.getViewName(), parse.getColName(), parse.getWhatToDel());
-				break;
-			case eShow:
+			case eShow: //good
 				DB.show(parse.getViewName());
-				break;
-			default:
-				break;
 		}
 		// if (parse.whatComm == eCreate)
 		// 	DB.create(parse.getFromName());

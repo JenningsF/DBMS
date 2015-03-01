@@ -39,6 +39,17 @@ string_command Parser::getCommand() {
 	return command;
 }
 
+string Parser::getTableName() {
+	return tableName;
+}
+
+vector<attribute> Parser::getAttributes() {
+	return attrVect;
+}
+
+vector<string> Parser::getPrimaryKeys() {
+	return primaryKeys;
+}
 
 //------------------------------------------------------------------------------------------------------
 //Parser:: parse(string l)
@@ -47,47 +58,53 @@ void Parser::parse(string l){
 	line = l;
 	string temp = line.substr(0, line.find(' '));
 	if (temp == "CREATE" || temp == "OPEN" || temp == "INSERT" || temp == "SHOW" || temp == "WRITE" || temp == "CLOSE" || temp == "EXIT")
-		parse_command(line);
+		parse_command();
 	else parse_query();
 }
 
 //--------------------------------------------------------------------------------------------------------
 //Parser:: parse_command(string l)
-
-void Parser::parse_command(string l){
-	string temp = l.substr(0, l.find(' '));
-	size_t delim = l.find(' ') + 1;
-	l.erase(0, delim);
-	string relation_name, pause;
+void Parser::parse_command(){
+	string temp = line.substr(0, line.find(' '));
+	size_t delim = line.find(' ') + 1;
+	line.erase(0, delim);
 	string_command command = hashit(temp);
 	switch (command){
-	
-	case eOpen:
-		fromName = line.substr(0, line.find('\0'));
+	case eOpen: //good
+		element open;
+		open.command = eOpen;
+		open.viewName = line.substr(0, line.find('\0'));
+		query.push_back(open);
 		break;
+	case 
 	case eCreate: //good
 		delim = line.find(' ') + 1; //erase TABLE before calling parse_create
 		line.erase(0, delim);
 		parse_create();
 		break;
 	case eInsert:
-		cout << "Call insert for: " << line << endl;
+		cout << "Call insert for: " << l << endl;
 		cin >> pause;
-		line.erase(0, line.find("INTO ") + 5);
-		parse_insert(line);
+		l.erase(0, l.find("INTO ") + 5);
+		parse_insert(l);
 		break;
 	case eShow: //good
-		viewName = line.substr(0, line.find('\0'));
-	case eShow:
-		relation_name = line.substr(0, line.find(' '));
-		cout << "Call show for relation: " << relation_name << endl;
-		cin >> pause;
+		element show;
+		show.command = eShow;
+		show.viewName = line.substr(0, line.find('\0'));
+		query.push_back(show);
 		break;
 	case eWrite: //good
-		fromName = line.substr(0, line.find('\0'));
+		element write;
+		write.command = eWrite;
+		write.viewName = line.substr(0, line.find('\0'));
+		query.push_back(write);
 		break;
 	case eClose: //good
-		fromName = line.substr(0, line.find('\0'));
+		element close;
+		close.command = eClose;
+		close.viewName = line.substr(0, line.find('\0'));
+		query.push_back(close);
 		break;
 	case eExit: //good
 		break;
@@ -97,45 +114,8 @@ void Parser::parse_command(string l){
 	}
 }
 
-
 //-------------------------------------------------------------------------------------------------------
 //void parse_type(string l, vector<attribute> attrVector, vector<string> primaryKey)
-void parse_type(string l, vector<string> primaryKey){
-
-	while (l.size() > 2){
-		string temp_type, temp_name;
-		int temp_size;
-		temp_name = l.substr(0, l.find(' ')); //get the name for attribute
-		l.erase(0, l.find(' ') + 1);
-		temp_type = l.substr(0, l.find('R') + 1);//all the types end with R
-		string_type type = hashtype(temp_type);
-
-		switch (type){ //switch the type for attribute
-		case eChar:
-			temp_type = "Char";
-			l.erase(0, l.find('(') + 1);//erase up to '(' before size
-			temp_size = atoi(l.substr(0, l.find(')')).c_str());
-			//attribute temp_attr(temp_name, temp_type, 0, temp_size);
-			primaryKey.push_back(temp_name);
-			cout << "Parsed attribute name:" << temp_name << " type: " << temp_type << " size:" << temp_size << endl;
-			l.erase(0, l.find(')') + 3);
-			break;
-		case eInt:
-			temp_type = "Int";
-			cout << "Parsed attribute name:" << temp_name << " type: " << temp_type << endl;
-			l.erase(0, l.find(')') + 1);
-			break;
-		default:
-			cout << "Something went wrong in parse_type switch(type)\n";
-		}
-	}
-	cout << "Primary key holds: ";
-	for (int i = 0; i < primaryKey.size(); i++)
-	{
-		cout << primaryKey[i] << " ";
-	}
-	cout << endl;
-}
 
 //--------------------------------------------------------------------------------------------------------
 //Parser::parse_query
@@ -262,52 +242,115 @@ void Parser::parse_query() {
 }
 //--------------------------------------------------------------------------------------------------------------------
 //Parser:: parse_create(string l)
-void Parser::parse_create(string l){
 
-	//vector<attribute> attrVect;
-	vector<string> primaryKey;
+void convertType(string &type) {
+	if(type == "VARCHAR" || type == "varchar") {
+		type = "string";
+	}
+	else if(type == "INTEGER" || type == "integer") {
+		type = "int";
+	}
+	else if(type == "DOUBLE" || type == "double") {
+		type = "double";
+	}
+	return;
+}
 
-	size_t pos = l.find('(') + 1;
-	string relation_name, typed_attribute_list, attribute_list;
-	relation_name = l.substr(0, l.find(' '));
-	l.erase(0, pos); //erase everything up to and including '("'
-	string delimeter = ", ";
-	pos = 0;
-	typed_attribute_list = l.substr(0, l.find(" PRIMARY")) + "  ";
-	cout << "typed attribute list: " << typed_attribute_list << endl;
-	//parse_type(typed_attribute_list, attrVect, primaryKey);
-	parse_type(typed_attribute_list, primaryKey);
+void Parser::parse_create(){
+	//Temp Variables
+	element create;
+	string name, type;
+	int size = 0;
+	//Parser
+	bool isDone = false;
+	create.command = eCreate;
+	while(!isDone) {
+		size_t pos = line.find(' ');
+		create.viewName = line.substr(0, pos);
+		line.erase(0, pos + 2); //erase tableName from line and first '('
+		pos = line.find(' ');
+		name = line.substr(0,pos); //attribute name
+		line.erase(0, pos + 1);
+		pos = line.find(' ');
+		if(line.substr(pos-2, pos-1) == ")") {//case for when there is a specified sized
+			pos = line.find('(');
+			type = line.substr(0,pos);
+			convertType(type);
+			line.erase(0, pos + 1);
+			pos = line.find(')');
+			size = atoi(line.substr(0,pos));
+			pos += 3;
+			line.erase(0, pos);
+		}
+		else if(line.substr(pos-1, pos) == ",") { //list continues
+			type = line.substr(0, pos - 1);
+			convertType(type);
+			pos += 1;
+			line.erase(0, pos);
+		}
+		else if(line.substr(pos-1,pos) == ")") { //list ends
+			type = line.substr(0, pos - 1);
+			convertType(type);
+			pos += 1;
+			line.erase(0, pos);
+			isDone = true;
+		}
+		//create and insert attribute
+		attribute temp(name, type, false, size);
+		create.attribs.push_back(temp);
+	}
+	//Parse primary key
+	size_t pos = line.find('(');
+	if(pos == string::npos) {
+		printf("Error: failed to provide Primary Key\n");
+		return;
+	}
+	pos += 1;
+	line.erase(0, pos);
+	isDone = false;
+	while(!isDone) {
+		string key;
+		if((pos = line.find(',')) == string::npos) {
+			pos = line.find(')');
+			key = line.substr(0, pos);
+			line.erase(0, pos);
+			isDone = true;
+		}
+		else {
+			key = line.substr(0, pos);
+			pos += 2;
+			line.erase(0, pos);
+		}
+		create.attribss.push_back(key);
+	}
+	query.push_back(create);
 }
 
 //--------------------------------------------------------------------------------------------------------------------
 //Parser:: parse_insert(string l)
 
-void Parser::parse_insert(string l){
-
+void Parser::parse_insert(){
+	//L SHOULD NOW REFERENCE THE string line IN THE .h file
 	string relation_name, expr, temp_literal;
 	vector<string> literals;
 	relation_name = l.substr(0, l.find(' '));
-	//cout << "INSERT INTO (Relation: " << relation_name << ") VALUES FROM (";
 	l.erase(0, l.find("FROM") + 5);
-	//cout << l << ")\n";
 	expr = l.substr(0, l.find(" "));
-	//cout << "EXPR: " << expr << endl;
 	if (expr != "RELATION"){
 		//need to get attributes of relation_name
 		l.erase(0, l.find('(') + 1); // Joe, cat, 4);
 		l.erase(l.find(')'), l.find(';') + 1);
 		l += " ";
-		//cout << "Erased ); at the end of: " << l << endl;
 		while (l.size() > 0){
 			temp_literal = l.substr(0, l.find(','));
 			literals.push_back(temp_literal);
 			l.erase(0, l.find(' ') + 1);
 		}
-		//for (int i = 0; i < literals.size(); i++){ cout << literals[i] << " "; }
 	}
 	else{ //needs to parse expr
 		l.erase(0, l.find("RELATION ") + 9);
 		expr = l.substr(0, l.find(';'));
-		//cout << expr << endl;
 	}
 }
+
+

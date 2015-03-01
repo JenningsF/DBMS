@@ -32,9 +32,9 @@ public:
 	void parse(string line);
 	//Rewrite this function to utilize the line variable
 	// getting rid of string l
-	void parse_command(string l);
-	void parse_create(string l);
-	void parse_insert(string l);
+	void parse_command();
+	void parse_create();
+	void parse_insert();
 	//following functions used to parse query
 	bool ValidateSelect();
 	bool parse_select(string select_string);
