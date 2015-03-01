@@ -61,42 +61,38 @@ void Parser::parse_command(string l){
 	string relation_name, pause;
 	string_command command = hashit(temp);
 	switch (command){
-	case eCreate:
-		cout << "Call create for: " << l << endl;
-		cin >> pause;
-		delim = l.find(' ') + 1; //erase TABLE before calling parse_create
-		l.erase(0, delim);
-		parse_create(l);
+	
+	case eOpen:
+		fromName = line.substr(0, line.find('\0'));
+		break;
+	case eCreate: //good
+		delim = line.find(' ') + 1; //erase TABLE before calling parse_create
+		line.erase(0, delim);
+		parse_create();
 		break;
 	case eInsert:
-		cout << "Call insert for: " << l << endl;
+		cout << "Call insert for: " << line << endl;
 		cin >> pause;
-		l.erase(0, l.find("INTO ") + 5);
-		parse_insert(l);
+		line.erase(0, line.find("INTO ") + 5);
+		parse_insert(line);
 		break;
+	case eShow: //good
+		viewName = line.substr(0, line.find('\0'));
 	case eShow:
-		relation_name = l.substr(0, l.find(' '));
+		relation_name = line.substr(0, line.find(' '));
 		cout << "Call show for relation: " << relation_name << endl;
 		cin >> pause;
 		break;
-	case eWrite:
-		relation_name = l.substr(0, l.find(' '));
-		cout << "Call write to table name: " << relation_name << endl;
-		cin >> pause;
+	case eWrite: //good
+		fromName = line.substr(0, line.find('\0'));
 		break;
-	case eClose:
-		relation_name = l.substr(0, l.find(' '));
-		cout << "Call close for file: " << relation_name << endl;
-		cin >> pause;
+	case eClose: //good
+		fromName = line.substr(0, line.find('\0'));
 		break;
-	case eExit:
-		cout << "Call exit" << endl;
-		cin >> pause;
-		//exit();
+	case eExit: //good
 		break;
-	default:
-		cout << "Entered switch(command), something went wrong\n";
-		cin >> pause;
+	default: //good
+		printf("Error: unsupported command\n");
 		break;
 	}
 }
