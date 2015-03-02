@@ -38,19 +38,6 @@ string Parser::getFromName() {
 string_command Parser::getCommand() {
 	return command;
 }
-
-string Parser::getTableName() {
-	return tableName;
-}
-
-vector<attribute> Parser::getAttributes() {
-	return attrVect;
-}
-
-vector<string> Parser::getPrimaryKeys() {
-	return primaryKeys;
-}
-
 //------------------------------------------------------------------------------------------------------
 //Parser:: parse(string l)
 
@@ -65,55 +52,57 @@ void Parser::parse(string l){
 //--------------------------------------------------------------------------------------------------------
 //Parser:: parse_command()
 void Parser::parse_command(){
+	element open;
+	element show;
+	element write;
+	element close;
+	char pause;
 	string temp = line.substr(0, line.find(' '));
 	size_t delim = line.find(' ') + 1;
 	line.erase(0, delim);
 	string_command command = hashit(temp);
 	switch (command){
-	case eOpen: //good
-		element open;
-		open.command = eOpen;
-		open.viewName = line.substr(0, line.find('\0'));
-		query.push_back(open);
-		break;
-	case eUpdate:
-		delim = line.find(' ') + 1;
-		line.erase(0,delim);
-		parser_update();
-	case eCreate: //good
-		delim = line.find(' ') + 1; //erase TABLE before calling parse_create
-		line.erase(0, delim);
-		parse_create();
-		break;
-	case eInsert:
-		cout << "Call insert for: " << line << endl;
-		cin >> pause;
-		line.erase(0, line.find("INTO ") + 5);
-		parse_insert(line);
-		break;
-	case eShow: //good
-		element show;
-		show.command = eShow;
-		show.viewName = line.substr(0, line.find('\0'));
-		query.push_back(show);
-		break;
-	case eWrite: //good
-		element write;
-		write.command = eWrite;
-		write.viewName = line.substr(0, line.find('\0'));
-		query.push_back(write);
-		break;
-	case eClose: //good
-		element close;
-		close.command = eClose;
-		close.viewName = line.substr(0, line.find('\0'));
-		query.push_back(close);
-		break;
-	case eExit: //good
-		break;
-	default: //good
-		printf("Error: unsupported command\n");
-		break;
+		case eOpen: //good
+			open.command = eOpen;
+			open.viewName = line.substr(0, line.find('\0'));
+			query.push_back(open);
+			break;
+		case eUpdate:
+			delim = line.find(' ') + 1;
+			line.erase(0,delim);
+			parse_update();
+			break;
+		case eCreate: //good
+			delim = line.find(' ') + 1; //erase TABLE before calling parse_create
+			line.erase(0, delim);
+			parse_create();
+			break;
+		case eInsert:
+			cout << "Call insert for: " << line << endl;
+			cin >> pause;
+			line.erase(0, line.find("INTO ") + 5);
+			parse_insert();
+			break;
+		case eShow: //good
+			show.command = eShow;
+			show.viewName = line.substr(0, line.find('\0'));
+			query.push_back(show);
+			break;
+		case eWrite: //good
+			write.command = eWrite;
+			write.viewName = line.substr(0, line.find('\0'));
+			query.push_back(write);
+			break;
+		case eClose: //good
+			close.command = eClose;
+			close.viewName = line.substr(0, line.find('\0'));
+			query.push_back(close);
+			break;
+		case eExit: //good
+			break;
+		default: //good
+			printf("Error: unsupported command\n");
+			break;
 	}
 }
 
@@ -281,7 +270,7 @@ void Parser::parse_create(){
 			convertType(type);
 			line.erase(0, pos + 1);
 			pos = line.find(')');
-			size = atoi(line.substr(0,pos));
+			size = atoi(line.substr(0,pos).c_str());
 			pos += 3;
 			line.erase(0, pos);
 		}
@@ -324,7 +313,7 @@ void Parser::parse_create(){
 			pos += 2;
 			line.erase(0, pos);
 		}
-		create.attribss.push_back(key);
+		create.attributes.push_back(key);
 	}
 	query.push_back(create);
 }
@@ -343,9 +332,9 @@ void Parser::parse_update() {
 	pos = line.find('\"') + 1;
 	line.erase(0,pos);
 	pos = line.find('\"');
-	update.value = line.substr(0,pos)
+	update.value = line.substr(0, pos);
 	pos += 2;
-	line.erase(0,pos)
+	line.erase(0, pos);
 	pos = line.find(' ') + 1;
 	line.erase(0, pos);
 	
@@ -354,7 +343,7 @@ void Parser::parse_update() {
 		string temp = "";
 		string temp2 = "";
 		pos = line.find('=') + 2;
-		temp += line.substr(0,pos)
+		temp += line.substr(0, pos);
 		line.erase(0,pos);
 		pos = line.find(' ');
 		if (pos == string::npos) {
@@ -386,7 +375,7 @@ void Parser::parse_insert() {
 	vector<string> literals;
 	element elem;	// holds critical data from parsed command
 	// relation_name = line.substr(0, l.find(' '));
-	elem.viewName = line.substr(0, l.find(' '));	// would put animals in viewName
+	elem.viewName = line.substr(0, line.find(' '));	// would put animals in viewName
 	line.erase(0, line.find("FROM") + 5);
 	expr = line.substr(0, line.find(" "));
 	if (expr != "RELATION") {
@@ -402,7 +391,7 @@ void Parser::parse_insert() {
 	}
 	else {	//needs to parse expr
 		line.erase(0, line.find("RELATION ") + 9);
-		expr = line.substr(0, line.find('('))
+		expr = line.substr(0, line.find('('));
 		if (expr == "project")
 			// *Cody, please check if I'm calling this correctly*
 			parse_query();

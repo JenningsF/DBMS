@@ -18,6 +18,8 @@ int main(int argc, char const *argv[]) {
 	string temp;
 	while (getline(cin, temp)) {
 		parse.parse(temp);
+		vector<element> query = parse.getQuery();
+		int a = 2;
 		switch(parse.getCommand()) {
 			case eOpen: //good
 				DB.open(parse.getFromName());
@@ -26,7 +28,7 @@ int main(int argc, char const *argv[]) {
 			case eInsert:
 		//		DB.insert(parse.getViewName(), parse.getRowData());
 			case eCreate: //good
-				DB.create(parse.getTableName(), parse.getAttributes(), parse.getPrimaryKeys());
+		//		DB.create(parse.getViewName(), parse.getAttributes(), parse.getPrimaryKeys());
 			case eWrite: //good
 				DB.write(parse.getFromName());
 			case eExit: //good

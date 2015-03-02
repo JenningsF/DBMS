@@ -40,6 +40,7 @@ public:
 	bool ValidateSelect();
 	bool parse_select(string select_string);
 	element parse_list(string list_string);
+	vector<element> getQuery() { return query; }
 	void parse_query();
 	
 	//Create get functions for private members
