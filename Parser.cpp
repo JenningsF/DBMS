@@ -63,7 +63,7 @@ void Parser::parse(string l){
 }
 
 //--------------------------------------------------------------------------------------------------------
-//Parser:: parse_command(string l)
+//Parser:: parse_command()
 void Parser::parse_command(){
 	string temp = line.substr(0, line.find(' '));
 	size_t delim = line.find(' ') + 1;
@@ -83,10 +83,10 @@ void Parser::parse_command(){
 		parse_create();
 		break;
 	case eInsert:
-		cout << "Call insert for: " << l << endl;
+		cout << "Call insert for: " << line << endl;
 		cin >> pause;
-		l.erase(0, l.find("INTO ") + 5);
-		parse_insert(l);
+		line.erase(0, line.find("INTO ") + 5);
+		parse_insert(line);
 		break;
 	case eShow: //good
 		element show;
@@ -327,30 +327,37 @@ void Parser::parse_create(){
 }
 
 //--------------------------------------------------------------------------------------------------------------------
-//Parser:: parse_insert(string l)
-
-void Parser::parse_insert(){
-	//L SHOULD NOW REFERENCE THE string line IN THE .h file
-	string relation_name, expr, temp_literal;
+//Parser:: parse_insert()
+//Example: INSERT INTO animals FROM ...
+void Parser::parse_insert() {
+	string expr, dataVal;
 	vector<string> literals;
-	relation_name = l.substr(0, l.find(' '));
-	l.erase(0, l.find("FROM") + 5);
-	expr = l.substr(0, l.find(" "));
-	if (expr != "RELATION"){
+	element elem;	// holds critical data from parsed command
+	// relation_name = line.substr(0, l.find(' '));
+	elem.viewName = line.substr(0, l.find(' '));	// would put animals in viewName
+	line.erase(0, line.find("FROM") + 5);
+	expr = line.substr(0, line.find(" "));
+	if (expr != "RELATION") {
 		//need to get attributes of relation_name
-		l.erase(0, l.find('(') + 1); // Joe, cat, 4);
-		l.erase(l.find(')'), l.find(';') + 1);
-		l += " ";
-		while (l.size() > 0){
-			temp_literal = l.substr(0, l.find(','));
-			literals.push_back(temp_literal);
-			l.erase(0, l.find(' ') + 1);
+		line.erase(0, line.find('(') + 1);	// Joe, cat, 4);
+		line.erase(line.find(')'), line.find(';') + 1);
+		line += " ";
+		while (line.size() > 0) {
+			dataVal = line.substr(0, line.find(','));
+			elem.attributes.push_back(dataVal);
+			line.erase(0, line.find(' ') + 1);
 		}
 	}
-	else{ //needs to parse expr
-		l.erase(0, l.find("RELATION ") + 9);
-		expr = l.substr(0, l.find(';'));
+	else {	//needs to parse expr
+		line.erase(0, line.find("RELATION ") + 9);
+		expr = line.substr(0, line.find('('))
+		if (expr == "project")
+			// *Cody, please check if I'm calling this correctly*
+			parse_query();
+		else {
+			dataVal = line.substr(0, line.find(';'));
+			elem.fromName = dataVal;
+		}
+		// expr = line.substr(0, line.find(';'));
 	}
 }
-
-

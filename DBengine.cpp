@@ -598,4 +598,3 @@ vector<string> DefineKey(stringstream& data) {
 	}
 	return keys;
 }
-

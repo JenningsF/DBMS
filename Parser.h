@@ -43,7 +43,3 @@ public:
 	
 	//Create get functions for private members
 }; 
-
-
-
-
