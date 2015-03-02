@@ -255,16 +255,18 @@ Opens the file, writes changes made to the Relation, and then closes the file th
 bool DBengine::write(string fileName) {
 	ofstream outfile;
 	string fileExtension = fileName.substr(fileName.size() - 3, 3);
+	string actualName = "";
 	if (fileExtension.compare(".db") != 0) {	// Checks is file extension exists
-		string fileName = fileName + ".db";			// If it doesn't, adds '.db' extension
+		actualName = fileName;
+		fileName = fileName + ".db";			// If it doesn't, adds '.db' extension
 	}
 
 	outfile.open(fileName.c_str(), ios_base::app);
 	if (outfile.is_open()) {
 		for (int i = 0; i < tables.size(); ++i) {
 			string relationName = tables[i]->getName();
-			if(relationName == fileName)
-				outfile << tables[i] << endl;
+			if(relationName == actualName)
+				outfile << *tables[i] << endl;
 		}
 		outfile.close();
 		return true;

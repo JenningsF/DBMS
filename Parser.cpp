@@ -57,6 +57,13 @@ void Parser::parse(string l){
 		query.push_back(create);
 		parse_query();
 	}
+	element last = query[query.size() - 1];
+	if (last.command == eCreate || last.command == eWrite || last.command == eShow || last.command == eClose) {
+		if (last.viewName == "") query[query.size() - 1].command = ERROR;
+	}
+	else {
+		if (last.fromName == "") query[query.size() - 1].command = ERROR;
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------
@@ -91,17 +98,20 @@ void Parser::parse_command(){
 		break;
 	case eShow: //good
 		show.command = eShow;
-		show.viewName = line.substr(0, line.find('\0'));
+		show.viewName = line.substr(0, line.find(';'));
+		line.erase(0, line.find(';'));
 		query.push_back(show);
 		break;
 	case eWrite: //good
 		write.command = eWrite;
-		write.viewName = line.substr(0, line.find('\0'));
+		write.viewName = line.substr(0, line.find(';'));
+		line.erase(0, line.find(';'));
 		query.push_back(write);
 		break;
 	case eClose: //good
 		close.command = eClose;
-		close.viewName = line.substr(0, line.find('\0'));
+		close.viewName = line.substr(0, line.find(';'));
+		line.erase(0, line.find(';'));
 		query.push_back(close);
 		break;
 	case eDelete:

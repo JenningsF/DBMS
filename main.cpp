@@ -20,29 +20,54 @@ int main(int argc, char const *argv[]) {
 		parse.parse(temp);
 		vector<element> query = parse.getQuery();
 		int a = 2;
-		switch(parse.getCommand()) {
-			case eOpen: //good
-				DB.open(parse.getFromName());
-			case eClose: //good
-				DB.close(parse.getFromName());
-			case eInsert:
-		//		DB.insert(parse.getViewName(), parse.getRowData());
-			case eCreate: //good
-		//		DB.create(parse.getViewName(), parse.getAttributes(), parse.getPrimaryKeys());
-			case eWrite: //good
-				DB.write(parse.getFromName());
-			case eExit: //good
-				DB.exitEngine();
-			case eUpdate:
-		//		DB.update(parse.getViewName(), parse.getRowIndex(), parse.getColName(), parse.getData());
-			case eDelete:
-		//		DB.del(parse.getViewName(), parse.getColName(), parse.getWhatToDel());
-			case eShow: //good
-				DB.show(parse.getViewName());
+		for (int i = query.size() - 1; i >= 0; --i) {
+			switch (query[i].command) {
+				case eOpen: //good
+					DB.open(query[i].viewName);
+					break;
+				case eClose: //good
+					DB.close(query[i].viewName);
+					break;
+				case eInsert:
+					//		DB.insert(parse.getViewName(), parse.getRowData());
+					break;
+				case eCreate: //good
+					DB.create(query[i].viewName, query[i].attribs, query[i].attributes);
+					break;
+				case eWrite: //good
+					DB.write(query[i].viewName);
+					break;
+				case eExit: //good
+					DB.exitEngine();
+					break;
+				case eUpdate:
+					//		DB.update(parse.getViewName(), parse.getRowIndex(), parse.getColName(), parse.getData());
+					break;
+				case eDelete:
+					//		DB.del(parse.getViewName(), parse.getColName(), parse.getWhatToDel());
+					break;
+				case eShow: //good
+					DB.show(query[i].viewName);
+					break;
+				case eSelect:
+					break;
+				case eUnion:
+					break;
+				case eDiff:
+					break;
+				case eCross:
+					break;
+				case eRename:
+					break;
+				case eProject:
+					break;
+				case ERROR:
+				default:
+					cout << "\nINVALID COMMAND" << endl;
+					return -1;
+					break;
+			}
 		}
-		// if (parse.whatComm == eCreate)
-		// 	DB.create(parse.getFromName());
-		// else if (parse.isShow)
-		// 	DB.show(parse.tableName());
+		parse.cleanQuery();
 	}
 }

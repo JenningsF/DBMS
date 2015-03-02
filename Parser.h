@@ -38,6 +38,8 @@ public:
 	void parse_insert();
 	void parse_update();
 	void parse_delete();
+
+	void cleanQuery() { query.clear(); }
 	//following functions used to parse query
 	bool ValidateSelect();
 	bool parse_select(string select_string);
