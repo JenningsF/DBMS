@@ -76,7 +76,10 @@ void Parser::parse_command(){
 		open.viewName = line.substr(0, line.find('\0'));
 		query.push_back(open);
 		break;
-	case 
+	case eUpdate:
+		delim = line.find(' ') + 1;
+		line.erase(0,delim);
+		parser_update();
 	case eCreate: //good
 		delim = line.find(' ') + 1; //erase TABLE before calling parse_create
 		line.erase(0, delim);
@@ -324,6 +327,55 @@ void Parser::parse_create(){
 		create.attribss.push_back(key);
 	}
 	query.push_back(create);
+}
+
+void Parser::parse_update() {
+	element update;
+	update.command = eUpdate;
+	size_t pos = line.find(' ');
+	update.viewName = line.substr(0, pos);
+	pos += 1;
+	line.erase(0,pos);
+	pos = line.find(' ') + 1;
+	line.erase(0, pos);
+	pos = line.find(' ');
+	update.column = line.substr(0, pos);
+	pos = line.find('\"') + 1;
+	line.erase(0,pos);
+	pos = line.find('\"');
+	update.value = line.substr(0,pos)
+	pos += 2;
+	line.erase(0,pos)
+	pos = line.find(' ') + 1;
+	line.erase(0, pos);
+	
+	while(true)
+	{
+		string temp = "";
+		string temp2 = "";
+		pos = line.find('=') + 2;
+		temp += line.substr(0,pos)
+		line.erase(0,pos);
+		pos = line.find(' ');
+		if (pos == string::npos) {
+			// No more conditions
+			pos = line.find('\0');
+			temp += line.substr(0, pos);
+			update.attributes.push_back(temp);
+			line.erase(0, pos);
+			break;
+		}
+		else {
+			// Additional conditions expected
+			temp += line.substr(0,pos);
+			update.attributes.push_back(temp);
+			line.erase(0, pos+1);
+			pos = line.find(" ");
+			temp2 = line.substr(0, pos);
+			update.attributes.push_back(temp2);
+			line.erase(0, pos+1);
+		}
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------
