@@ -256,15 +256,15 @@ void Parser::parse_create(){
 	//Parser
 	bool isDone = false;
 	create.command = eCreate;
+	size_t pos = line.find(' ');
+	create.viewName = line.substr(0, pos);
+	line.erase(0, pos + 2); //erase tableName from line and first '('
 	while(!isDone) {
-		size_t pos = line.find(' ');
-		create.viewName = line.substr(0, pos);
-		line.erase(0, pos + 2); //erase tableName from line and first '('
 		pos = line.find(' ');
 		name = line.substr(0,pos); //attribute name
 		line.erase(0, pos + 1);
 		pos = line.find(' ');
-		if(line.substr(pos-2, pos-1) == ")") {//case for when there is a specified sized
+		if(line.substr(pos-2, 1) == ")") {//case for when there is a specified sized
 			pos = line.find('(');
 			type = line.substr(0,pos);
 			convertType(type);
@@ -274,13 +274,13 @@ void Parser::parse_create(){
 			pos += 3;
 			line.erase(0, pos);
 		}
-		else if(line.substr(pos-1, pos) == ",") { //list continues
+		else if(line.substr(pos-1, 1) == ",") { //list continues
 			type = line.substr(0, pos - 1);
 			convertType(type);
 			pos += 1;
 			line.erase(0, pos);
 		}
-		else if(line.substr(pos-1,pos) == ")") { //list ends
+		else if(line.substr(pos-1,1) == ")") { //list ends
 			type = line.substr(0, pos - 1);
 			convertType(type);
 			pos += 1;
@@ -292,7 +292,7 @@ void Parser::parse_create(){
 		create.attribs.push_back(temp);
 	}
 	//Parse primary key
-	size_t pos = line.find('(');
+	pos = line.find('(');
 	if(pos == string::npos) {
 		printf("Error: failed to provide Primary Key\n");
 		return;
