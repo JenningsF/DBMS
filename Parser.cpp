@@ -44,9 +44,19 @@ string_command Parser::getCommand() {
 void Parser::parse(string l){
 	line = l;
 	string temp = line.substr(0, line.find(' '));
-	if (temp == "CREATE" || temp == "OPEN" || temp == "INSERT" || temp == "SHOW" || temp == "WRITE" || temp == "CLOSE" || temp == "UPDATE" || temp == "EXIT" || temp == "DELETE")
+	if (temp == "CREATE" || temp == "OPEN" || temp == "INSERT" || temp == "SHOW" || temp == "WRITE" || temp == "CLOSE" || temp == "UPDATE"|| temp == "EXIT" || temp == "DELETE")
 		parse_command();
-	else parse_query();
+	else {
+		//Strip off viewName
+		size_t pos = 0;
+		element create;
+		pos = line.find(" ");
+		create.viewName = line.substr(0, pos);
+		create.command = eCreate;
+		line.erase(0, pos + 4);
+		query.push_back(create);
+		parse_query();
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------
@@ -62,47 +72,47 @@ void Parser::parse_command(){
 	line.erase(0, delim);
 	string_command command = hashit(temp);
 	switch (command){
-		case eOpen: //good
-			open.command = eOpen;
-			open.viewName = line.substr(0, line.find('\0'));
-			query.push_back(open);
-			break;
-		case eUpdate:
-			parse_update();
-			break;
-		case eCreate: //good
-			delim = line.find(' ') + 1; //erase TABLE before calling parse_create
-			line.erase(0, delim);
-			parse_create();
-			break;
-		case eInsert:
-			line.erase(0, line.find("INTO ") + 5);
-			parse_insert();
-			break;
-		case eShow: //good
-			show.command = eShow;
-			show.viewName = line.substr(0, line.find('\0'));
-			query.push_back(show);
-			break;
-		case eWrite: //good
-			write.command = eWrite;
-			write.viewName = line.substr(0, line.find('\0'));
-			query.push_back(write);
-			break;
-		case eClose: //good
-			close.command = eClose;
-			close.viewName = line.substr(0, line.find('\0'));
-			query.push_back(close);
-			break;
-		case eDelete:
-			line.erase(0, line.find("FROM") + 5);
-			parse_delete();
-			break;
-		case eExit: //good
-			break;
-		default: //good
-			printf("Error: unsupported command\n");
-			break;
+	case eOpen: //good
+		open.command = eOpen;
+		open.viewName = line.substr(0, line.find('\0'));
+		query.push_back(open);
+		break;
+	case eUpdate:
+		parse_update();
+		break;
+	case eCreate: //good
+		delim = line.find(' ') + 1; //erase TABLE before calling parse_create
+		line.erase(0, delim);
+		parse_create();
+		break;
+	case eInsert:
+		line.erase(0, line.find("INTO ") + 5);
+		parse_insert();
+		break;
+	case eShow: //good
+		show.command = eShow;
+		show.viewName = line.substr(0, line.find('\0'));
+		query.push_back(show);
+		break;
+	case eWrite: //good
+		write.command = eWrite;
+		write.viewName = line.substr(0, line.find('\0'));
+		query.push_back(write);
+		break;
+	case eClose: //good
+		close.command = eClose;
+		close.viewName = line.substr(0, line.find('\0'));
+		query.push_back(close);
+		break;
+	case eDelete:
+		line.erase(0, line.find("FROM") + 5);
+		parse_delete();
+		break;
+	case eExit: //good
+		break;
+	default: //good
+		printf("Error: unsupported command\n");
+		break;
 	}
 }
 
@@ -136,6 +146,8 @@ bool Parser::ValidateSelect() {
 bool Parser::parse_select(string select_string){
 	string type = "";
 	size_t pos = 0;
+	size_t pos_or = 0;
+	size_t pos_and = 0;
 	pos = select_string.find(" ");
 	type = select_string.substr(0, pos);
 	select_string.erase(0, pos + 2);
@@ -144,25 +156,21 @@ bool Parser::parse_select(string select_string){
 		element select;
 		// Get column name and erase from command
 		select.query_type = type;
-		select.column = select_string.substr(0, pos = select_string.find(" "));
-		select_string.erase(0, select.column.length() + 1);
-		// Get attribute value and erase from command
-		select.attributes.push_back(select_string.substr(0, 2));
-		select_string.erase(0, 3);
-		// See if there is additional conditions
-		pos = select_string.find(" ");
-		if (pos == string::npos) {
-			// No more conditions
-			select.value = select_string.substr(0, select_string.find(")"));
-			select_string.erase(0, select.value.length()+1);
+		select.command = eSelect;
+		pos_or = select_string.find("||");
+		pos_and = select_string.find("&&");
+		pos = select_string.find(")");
+		if (pos_or < pos_and && pos_or < pos) {
+			select.attributes.push_back(select_string.substr(0, pos_or));
+			select_string.erase(0, pos_or+2);
+		}
+		else if (pos_and < pos_or && pos_and < pos) {
+			select.attributes.push_back(select_string.substr(0, pos_and));
+			select_string.erase(0, pos_and+2);
 		}
 		else {
-			// Additional conitions expected
-			select.value = select_string.substr(0, pos);
-			select_string.erase(0, pos+1);
-			pos = select_string.find(" ");
 			select.attributes.push_back(select_string.substr(0, pos));
-			select_string.erase(0, pos+1);
+			select_string.erase(0, pos + 2);
 		}
 		trimQuote(select.value);
 		query.push_back(select);
@@ -171,23 +179,21 @@ bool Parser::parse_select(string select_string){
 }
 
 //Parses rename and project
-element Parser::parse_list(string list_string) {
-	element list;
+vector<string> Parser::parse_list(string list_string) {
+	vector<string> list;
 	size_t pos = 0;
-	pos = list_string.find(" ");
-	list.query_type = list_string.substr(0, pos);
-	list_string.erase(0, pos + 2);
+	while (list_string[0] == ' ' || list_string[0] == '(') list_string.erase(0, 1);
 	while (true){
 		pos = list_string.find(',');
 		if (pos == string::npos){
 			pos = list_string.find(')');
 			string temp = list_string.substr(0, pos);
-			list.attributes.push_back(temp);
+			list.push_back(temp);
 			break;
 		}
 		else {
 			string temp = list_string.substr(0, pos);
-			list.attributes.push_back(temp);
+			list.push_back(temp);
 			list_string.erase(0, pos + 2);
 		}
 	}
@@ -200,35 +206,55 @@ void Parser::parse_query() {
 	//Use while loop and check for new atomic expression until end of line
 	//Append the parsed command to the vector initialized within parse_query 
 	//vector<element> parsed_command;
-	
-	//Strip off viewName
-	size_t pos = 0;
-	pos = line.find(" ");
-	viewName = line.substr(0,pos);
-	line.erase(0,pos + 4);
+	size_t pos = min(line.find(' '), line.find(';'));
+
 	//Process Query
 	while(pos != string::npos){
+		while (line[0] == ' ' || line[0] == '(') line.erase(0, 1);
 		pos = line.find(" ");
 		string temp = line.substr(0,pos);
 		if (temp == "select"){
 			pos = line.find(')') + 1;
 			string select_string = line.substr(0, pos);
 			bool test = parse_select(select_string);
-			line.erase(0, pos);
+			line.erase(0, pos + 1);
 		}
 		else if (temp == "rename" || temp == "project"){
+			line.erase(0, pos + 1);
 			pos = line.find(')') + 1;
+			element rename_project;
+			if (temp == "rename") rename_project.command = eRename;
+			else rename_project.command = eProject;
 			string list_string = line.substr(0, pos);
-			element list = parse_list(list_string);
-			query.push_back(list);
+			rename_project.attributes = parse_list(list_string);
+			query.push_back(rename_project);
 			line.erase(0, pos);
 		}
 		else { // Relational algebra
-			// Stores relation on left hand side
-			fromName = line.substr(0, pos);
-			line.erase(0,pos + 1);
-
-			line.erase(0, line.find(' ') + 1);
+			size_t pos_union = line.find('+');
+			size_t pos_diff = line.find('-');
+			size_t pos_cross = line.find('*');
+			size_t pos_end = min(line.find(';'), line.find(')'));			
+			size_t minimum = min(pos_union, pos_diff);
+			minimum = min(minimum, pos_cross);
+			// Check if end of query has been found
+			if (pos_end < pos && pos_end < pos_union && pos_end < pos_diff && pos_end < pos_cross) {
+				query[query.size() - 1].fromName = line.substr(0, pos_end);
+				line.erase(0, pos_end + 1);
+			}
+			// Check if an algebra expression exists
+			else if (minimum < pos_end) {
+				element algebra;
+				algebra.viewName = line.substr(0, line.find(' '));
+				if (line[minimum] == '+') algebra.command = eUnion;
+				else if (line[minimum] == '-') algebra.command = eDiff;
+				else if (line[minimum] == '*') algebra.command = eCross;
+				line.erase(0, minimum + 2);
+				pos_end = min(line.find(';'), line.find(')'));
+				algebra.fromName = line.substr(0, pos_end);
+				line.erase(0, pos_end);
+				query.push_back(algebra);
+			}
 		}
 	}
 }
@@ -259,28 +285,28 @@ void Parser::parse_create(){
 	size_t pos = line.find(' ');
 	create.viewName = line.substr(0, pos);
 	line.erase(0, pos + 2); //erase tableName from line and first '('
-	while(!isDone) {
+	while (!isDone) {
 		pos = line.find(' ');
-		name = line.substr(0,pos); //attribute name
+		name = line.substr(0, pos); //attribute name
 		line.erase(0, pos + 1);
 		pos = line.find(' ');
-		if(line.substr(pos-2, 1) == ")") {//case for when there is a specified sized
+		if (line.substr(pos - 2, 1) == ")") {//case for when there is a specified sized
 			pos = line.find('(');
-			type = line.substr(0,pos);
+			type = line.substr(0, pos);
 			convertType(type);
 			line.erase(0, pos + 1);
 			pos = line.find(')');
-			size = atoi(line.substr(0,pos).c_str());
+			size = atoi(line.substr(0, pos).c_str());
 			pos += 3;
 			line.erase(0, pos);
 		}
-		else if(line.substr(pos-1, 1) == ",") { //list continues
+		else if (line.substr(pos - 1, 1) == ",") { //list continues
 			type = line.substr(0, pos - 1);
 			convertType(type);
 			pos += 1;
 			line.erase(0, pos);
 		}
-		else if(line.substr(pos-1,1) == ")") { //list ends
+		else if (line.substr(pos - 1, 1) == ")") { //list ends
 			type = line.substr(0, pos - 1);
 			convertType(type);
 			pos += 1;
@@ -293,16 +319,16 @@ void Parser::parse_create(){
 	}
 	//Parse primary key
 	pos = line.find('(');
-	if(pos == string::npos) {
+	if (pos == string::npos) {
 		printf("Error: failed to provide Primary Key\n");
 		return;
 	}
 	pos += 1;
 	line.erase(0, pos);
 	isDone = false;
-	while(!isDone) {
+	while (!isDone) {
 		string key;
-		if((pos = line.find(',')) == string::npos) {
+		if ((pos = line.find(',')) == string::npos) {
 			pos = line.find(')');
 			key = line.substr(0, pos);
 			line.erase(0, pos);
@@ -337,6 +363,7 @@ void Parser::parse_update() {
 	line.erase(0, pos);
 	pos = line.find(' ') + 1;
 	line.erase(0, pos);
+	
 	while(true)
 	{
 		string temp = "";
@@ -392,15 +419,9 @@ void Parser::parse_insert() {
 	else {	//needs to parse expr
 		line.erase(0, line.find("RELATION ") + 9);
 		expr = line.substr(0, line.find('('));
-		if (expr == "project")
-			// *Cody, please check if I'm calling this correctly*
-			parse_query();
-		else {
-			dataVal = line.substr(0, line.find(';'));
-			elem.fromName = dataVal;
-		}
+		query.push_back(elem);
+		parse_query();
 	}
-	query.push_back(elem);
 }
 
 //--------------------------------------------------------------------------------------------------------------------
@@ -411,12 +432,12 @@ void Parser::parse_delete() {
 	del.command = eDelete;
 	del.viewName = line.substr(0, line.find(' '));
 	line.erase(0, line.find("WHERE ") + 6);
-	while(true) {
+	while (true) {
 		string temp = "";
 		string temp2 = "";
 		size_t pos = line.find('=') + 4;
 		temp += line.substr(0, pos);
-		line.erase(0,pos);
+		line.erase(0, pos);
 		pos = line.find(' ');
 		if (pos == string::npos) {
 			// No more conditions
@@ -428,13 +449,13 @@ void Parser::parse_delete() {
 		}
 		else {
 			// Additional conditions expected
-			temp += line.substr(0,pos);
+			temp += line.substr(0, pos);
 			del.attributes.push_back(temp);
-			line.erase(0, pos+1);
+			line.erase(0, pos + 1);
 			pos = line.find(" ");
 			temp2 = line.substr(0, pos);
 			del.attributes.push_back(temp2);
-			line.erase(0, pos+1);
+			line.erase(0, pos + 1);
 		}
 	}
 	query.push_back(del);

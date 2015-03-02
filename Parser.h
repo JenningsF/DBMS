@@ -1,5 +1,6 @@
 #include <string>
 #include <cstdlib>
+#include <algorithm>
 #include <iostream>
 #include <string>
 //Replace with new header file
@@ -40,7 +41,7 @@ public:
 	//following functions used to parse query
 	bool ValidateSelect();
 	bool parse_select(string select_string);
-	element parse_list(string list_string);
+	vector<string> parse_list(string list_string);
 	vector<element> getQuery() { return query; }
 	void parse_query();
 	
