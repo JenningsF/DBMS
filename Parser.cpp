@@ -85,6 +85,10 @@ void Parser::parse_command(){
 		line.erase(0, delim);
 		parse_create();
 		break;
+	case eDelete:
+		line.erase(0, line.find(" FROM ") + 6);
+		parse_delete();
+		break;
 	case eInsert:
 		cout << "Call insert for: " << line << endl;
 		cin >> pause;
@@ -376,6 +380,7 @@ void Parser::parse_update() {
 			line.erase(0, pos+1);
 		}
 	}
+	query.push_back(update);
 }
 
 //--------------------------------------------------------------------------------------------------------------------
@@ -413,3 +418,46 @@ void Parser::parse_insert() {
 		// expr = line.substr(0, line.find(';'));
 	}
 }
+
+//--------------------------------------------------------------------------------------------------------------------
+//Parser:: parse_delete()
+//Example: DELETE FROM animals WHERE
+void Parser::parse_delete() {
+	element del;
+	del.command = eDelete;
+	del.viewName = line.substr(0, line.find(' '));
+	line.erase(0, line.find("WHERE ") + 6);
+	// while (line.size() > 0) {
+	// 	dataVal = line.substr(0, line.find(','));
+	// 	insert.attributes.push_back(dataVal);
+	// 	line.erase(0, line.find(' ') + 1);
+	// }
+	while(true) {
+		string temp = "";
+		string temp2 = "";
+		pos = line.find('=') + 4;
+		temp += line.substr(0,pos)
+		line.erase(0,pos);
+		pos = line.find(' ');
+		if (pos == string::npos) {
+			// No more conditions
+			pos = line.find('\0');
+			temp += line.substr(0, pos);
+			update.attributes.push_back(temp);
+			line.erase(0, pos);
+			break;
+		}
+		else {
+			// Additional conditions expected
+			temp += line.substr(0,pos);
+			update.attributes.push_back(temp);
+			line.erase(0, pos+1);
+			pos = line.find(" ");
+			temp2 = line.substr(0, pos);
+			update.attributes.push_back(temp2);
+			line.erase(0, pos+1);
+		}
+	}
+	query.push_back(del);
+}
+
