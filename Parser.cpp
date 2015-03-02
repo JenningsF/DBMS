@@ -62,6 +62,7 @@ void Parser::parse_command(){
 	line.erase(0, delim);
 	string_command command = hashit(temp);
 	switch (command){
+<<<<<<< HEAD
 		case eOpen: //good
 			open.command = eOpen;
 			open.viewName = line.substr(0, line.find('\0'));
@@ -103,6 +104,56 @@ void Parser::parse_command(){
 		default: //good
 			printf("Error: unsupported command\n");
 			break;
+=======
+	case eOpen: //good
+		element open;
+		open.command = eOpen;
+		open.viewName = line.substr(0, line.find('\0'));
+		query.push_back(open);
+		break;
+	case eUpdate:
+		delim = line.find(' ') + 1;
+		line.erase(0,delim);
+		parser_update();
+	case eCreate: //good
+		delim = line.find(' ') + 1; //erase TABLE before calling parse_create
+		line.erase(0, delim);
+		parse_create();
+		break;
+	case eDelete:
+		line.erase(0, line.find(" FROM ") + 6);
+		parse_delete();
+		break;
+	case eInsert:
+		cout << "Call insert for: " << line << endl;
+		cin >> pause;
+		line.erase(0, line.find("INTO ") + 5);
+		parse_insert(line);
+		break;
+	case eShow: //good
+		element show;
+		show.command = eShow;
+		show.viewName = line.substr(0, line.find('\0'));
+		query.push_back(show);
+		break;
+	case eWrite: //good
+		element write;
+		write.command = eWrite;
+		write.viewName = line.substr(0, line.find('\0'));
+		query.push_back(write);
+		break;
+	case eClose: //good
+		element close;
+		close.command = eClose;
+		close.viewName = line.substr(0, line.find('\0'));
+		query.push_back(close);
+		break;
+	case eExit: //good
+		break;
+	default: //good
+		printf("Error: unsupported command\n");
+		break;
+>>>>>>> fc279378a56986d6e2e02f01eef3644b6582e295
 	}
 }
 
@@ -365,6 +416,7 @@ void Parser::parse_update() {
 			line.erase(0, pos+1);
 		}
 	}
+	query.push_back(update);
 }
 
 //--------------------------------------------------------------------------------------------------------------------
@@ -402,3 +454,46 @@ void Parser::parse_insert() {
 		// expr = line.substr(0, line.find(';'));
 	}
 }
+
+//--------------------------------------------------------------------------------------------------------------------
+//Parser:: parse_delete()
+//Example: DELETE FROM animals WHERE
+void Parser::parse_delete() {
+	element del;
+	del.command = eDelete;
+	del.viewName = line.substr(0, line.find(' '));
+	line.erase(0, line.find("WHERE ") + 6);
+	// while (line.size() > 0) {
+	// 	dataVal = line.substr(0, line.find(','));
+	// 	insert.attributes.push_back(dataVal);
+	// 	line.erase(0, line.find(' ') + 1);
+	// }
+	while(true) {
+		string temp = "";
+		string temp2 = "";
+		pos = line.find('=') + 4;
+		temp += line.substr(0,pos)
+		line.erase(0,pos);
+		pos = line.find(' ');
+		if (pos == string::npos) {
+			// No more conditions
+			pos = line.find('\0');
+			temp += line.substr(0, pos);
+			update.attributes.push_back(temp);
+			line.erase(0, pos);
+			break;
+		}
+		else {
+			// Additional conditions expected
+			temp += line.substr(0,pos);
+			update.attributes.push_back(temp);
+			line.erase(0, pos+1);
+			pos = line.find(" ");
+			temp2 = line.substr(0, pos);
+			update.attributes.push_back(temp2);
+			line.erase(0, pos+1);
+		}
+	}
+	query.push_back(del);
+}
+

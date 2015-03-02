@@ -36,6 +36,7 @@ public:
 	void parse_create();
 	void parse_insert();
 	void parse_update();
+	void parse_delete();
 	//following functions used to parse query
 	bool ValidateSelect();
 	bool parse_select(string select_string);
