@@ -44,7 +44,7 @@ string_command Parser::getCommand() {
 void Parser::parse(string l){
 	line = l;
 	string temp = line.substr(0, line.find(' '));
-	if (temp == "CREATE" || temp == "OPEN" || temp == "INSERT" || temp == "SHOW" || temp == "WRITE" || temp == "CLOSE" || temp == "UPDATE" || temp == "EXIT")
+	if (temp == "CREATE" || temp == "OPEN" || temp == "INSERT" || temp == "SHOW" || temp == "WRITE" || temp == "CLOSE" || temp == "UPDATE" || temp == "EXIT" || temp == "DELETE")
 		parse_command();
 	else parse_query();
 }
@@ -68,8 +68,6 @@ void Parser::parse_command(){
 			query.push_back(open);
 			break;
 		case eUpdate:
-			delim = line.find(' ') + 1;
-			line.erase(0,delim);
 			parse_update();
 			break;
 		case eCreate: //good
@@ -78,8 +76,6 @@ void Parser::parse_command(){
 			parse_create();
 			break;
 		case eInsert:
-			cout << "Call insert for: " << line << endl;
-			cin >> pause;
 			line.erase(0, line.find("INTO ") + 5);
 			parse_insert();
 			break;
@@ -97,6 +93,10 @@ void Parser::parse_command(){
 			close.command = eClose;
 			close.viewName = line.substr(0, line.find('\0'));
 			query.push_back(close);
+			break;
+		case eDelete:
+			line.erase(0, line.find("FROM") + 5);
+			parse_delete();
 			break;
 		case eExit: //good
 			break;
@@ -337,12 +337,11 @@ void Parser::parse_update() {
 	line.erase(0, pos);
 	pos = line.find(' ') + 1;
 	line.erase(0, pos);
-	
 	while(true)
 	{
 		string temp = "";
 		string temp2 = "";
-		pos = line.find('=') + 2;
+		pos = line.find('=') + 3;
 		temp += line.substr(0, pos);
 		line.erase(0,pos);
 		pos = line.find(' ');
@@ -375,7 +374,7 @@ void Parser::parse_insert() {
 	string expr, dataVal;
 	vector<string> literals;
 	element elem;	// holds critical data from parsed command
-	// relation_name = line.substr(0, l.find(' '));
+	elem.command = eInsert;
 	elem.viewName = line.substr(0, line.find(' '));	// would put animals in viewName
 	line.erase(0, line.find("FROM") + 5);
 	expr = line.substr(0, line.find(" "));
@@ -400,8 +399,8 @@ void Parser::parse_insert() {
 			dataVal = line.substr(0, line.find(';'));
 			elem.fromName = dataVal;
 		}
-		// expr = line.substr(0, line.find(';'));
 	}
+	query.push_back(elem);
 }
 
 //--------------------------------------------------------------------------------------------------------------------
@@ -412,11 +411,6 @@ void Parser::parse_delete() {
 	del.command = eDelete;
 	del.viewName = line.substr(0, line.find(' '));
 	line.erase(0, line.find("WHERE ") + 6);
-	// while (line.size() > 0) {
-	// 	dataVal = line.substr(0, line.find(','));
-	// 	insert.attributes.push_back(dataVal);
-	// 	line.erase(0, line.find(' ') + 1);
-	// }
 	while(true) {
 		string temp = "";
 		string temp2 = "";
