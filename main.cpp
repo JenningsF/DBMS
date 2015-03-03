@@ -29,7 +29,7 @@ int main(int argc, char const *argv[]) {
 					DB.close(query[i].viewName);
 					break;
 				case eInsert:
-					//		DB.insert(parse.getViewName(), parse.getRowData());
+					DB.insert(query[i].viewName, query[i].attributes);
 					break;
 				case eCreate: //good
 					DB.create(query[i].viewName, query[i].attribs, query[i].attributes);
@@ -39,7 +39,7 @@ int main(int argc, char const *argv[]) {
 					break;
 				case eExit: //good
 					DB.exitEngine();
-					break;
+					return 0;
 				case eUpdate:
 					//		DB.update(parse.getViewName(), parse.getRowIndex(), parse.getColName(), parse.getData());
 					break;

@@ -45,7 +45,7 @@ class Relation {
 		int getColumnSize();
 		vector<string> getColumnNames();
 		const vector<Row> getRows();
-		Row getRow(int i);
+		Row& getRow(int i);
 		// Setter functions
 		void setName(string n);
 		void setAttributes(vector<attribute> attribs);
@@ -144,7 +144,7 @@ class DBengine {
 		Relation* select(string tableName, vector<string> colNames, char allTableIndicator);
 		void output();
 		void create(string tableName, vector<attribute> attrVect, vector<string> primaryKeys);
-		void insert(string tableName, vector<attribute> rowData);
+		void insert(string tableName, vector<string> rowData);
 		template <typename T>
 		void del(string tableName, string colName, T rowToDel);
 		template <typename T>

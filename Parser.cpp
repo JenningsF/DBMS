@@ -44,7 +44,7 @@ string_command Parser::getCommand() {
 void Parser::parse(string l){
 	line = l;
 	string temp = line.substr(0, line.find(' '));
-	if (temp == "CREATE" || temp == "OPEN" || temp == "INSERT" || temp == "SHOW" || temp == "WRITE" || temp == "CLOSE" || temp == "UPDATE"|| temp == "EXIT" || temp == "DELETE")
+	if (temp == "CREATE" || temp == "OPEN" || temp == "INSERT" || temp == "SHOW" || temp == "WRITE" || temp == "CLOSE" || temp == "UPDATE" || temp == "EXIT" || temp == "DELETE")
 		parse_command();
 	else {
 		//Strip off viewName
@@ -58,7 +58,7 @@ void Parser::parse(string l){
 		parse_query();
 	}
 	element last = query[query.size() - 1];
-	if (last.command == eCreate || last.command == eWrite || last.command == eShow || last.command == eClose) {
+	if (last.command == eCreate || last.command == eWrite || last.command == eShow || last.command == eClose || last.command == eOpen || last.command == eInsert) {
 		if (last.viewName == "") query[query.size() - 1].command = ERROR;
 	}
 	else {
@@ -73,6 +73,7 @@ void Parser::parse_command(){
 	element show;
 	element write;
 	element close;
+	element exit;
 	char pause;
 	string temp = line.substr(0, line.find(' '));
 	size_t delim = line.find(' ') + 1;
@@ -81,7 +82,7 @@ void Parser::parse_command(){
 	switch (command){
 	case eOpen: //good
 		open.command = eOpen;
-		open.viewName = line.substr(0, line.find('\0'));
+		open.viewName = line.substr(0, line.find(';'));
 		query.push_back(open);
 		break;
 	case eUpdate:
@@ -119,6 +120,8 @@ void Parser::parse_command(){
 		parse_delete();
 		break;
 	case eExit: //good
+		exit.command = eExit;
+		query.push_back(exit);
 		break;
 	default: //good
 		printf("Error: unsupported command\n");
@@ -132,10 +135,12 @@ void Parser::parse_command(){
 //--------------------------------------------------------------------------------------------------------
 //Parser::parse_query
 void trimQuote(string& s) {
-	string temp = "";
-	if (s[0] == '"' && s[s.length() - 1] == '"')
-		temp = s.substr(1, s.length() - 2);
-	s = temp;
+	if (s[0] == '"' || s[0] == '\'' || s[0] == ' ') {
+		s = s.substr(1, s.length());
+	}
+	if (s[s.length() - 1] == '"' || s[s.length() - 1] == '\'' || s[s.length() - 1] == ' ') {
+		s = s.substr(0, s.length() - 1);
+	}
 }
 
 //Parser::Validate Query objects
@@ -421,7 +426,9 @@ void Parser::parse_insert() {
 		line.erase(line.find(')'), line.find(';') + 1);
 		line += " ";
 		while (line.size() > 0) {
+			size_t p = line.find(',');
 			dataVal = line.substr(0, line.find(','));
+			trimQuote(dataVal);
 			elem.attributes.push_back(dataVal);
 			line.erase(0, line.find(' ') + 1);
 		}
@@ -429,9 +436,9 @@ void Parser::parse_insert() {
 	else {	//needs to parse expr
 		line.erase(0, line.find("RELATION ") + 9);
 		expr = line.substr(0, line.find('('));
-		query.push_back(elem);
 		parse_query();
 	}
+	query.push_back(elem);
 }
 
 //--------------------------------------------------------------------------------------------------------------------

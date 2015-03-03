@@ -31,7 +31,7 @@ int Relation::getSize() { return size; }
 int Relation::getColumnSize() { return colSize; }
 vector<string> Relation::getColumnNames() { return columnNames; }
 const vector<Row> Relation::getRows() { return rows; }
-Row Relation::getRow(int i) { 
+Row& Relation::getRow(int i) { 
 	if (i < size && i > -1)
 		return rows[i];
 	else throw RowNotFound();
@@ -203,13 +203,14 @@ Open file and read into vector of Relations and then close file
 bool DBengine::open(string fileName) {
 	ifstream myfile;
 	string fileExtension = fileName.substr(fileName.size() - 3, 3);
+	string actualName = fileName.substr(0,fileName.find('.'));
 	if (fileExtension.compare(".db") != 0) {	// Checks is file extension exists
 		fileName += ".db";						// If it doesn't, adds '.db' extension
 	}
 
 	myfile.open(fileName.c_str());
 	if (myfile.is_open()) {
-		tables.push_back(new Relation(fileName));
+		tables.push_back(new Relation(actualName));
 		myfile >> *tables[tables.size()-1];
 		myfile.close();
 		return true;
@@ -243,8 +244,8 @@ that are being used and then exits the program
 */
 void DBengine::exitEngine() {
 	int i = 0;
-	while (tables.size() != 0) {
-		close(tables[i]->getName());
+	for (int i = 0; i < tables.size(); ++i) {
+		delete tables[i];
 	}
 	exit(0);
 }
@@ -255,13 +256,12 @@ Opens the file, writes changes made to the Relation, and then closes the file th
 bool DBengine::write(string fileName) {
 	ofstream outfile;
 	string fileExtension = fileName.substr(fileName.size() - 3, 3);
-	string actualName = "";
+	string actualName = fileName.substr(0,fileName.find('.'));
 	if (fileExtension.compare(".db") != 0) {	// Checks is file extension exists
-		actualName = fileName;
 		fileName = fileName + ".db";			// If it doesn't, adds '.db' extension
 	}
 
-	outfile.open(fileName.c_str(), ios_base::app);
+	outfile.open(fileName.c_str());
 	if (outfile.is_open()) {
 		for (int i = 0; i < tables.size(); ++i) {
 			string relationName = tables[i]->getName();
@@ -283,7 +283,7 @@ void DBengine::show(string tableName) {
 	for (int i = 0; i < tables.size(); ++i) {
 		string relationName = tables[i]->getName();
 		if(relationName == tableName)
-			cout << tables[i] << endl;
+			cout << *tables[i] << endl;
 	}
 }
 
@@ -351,7 +351,7 @@ void DBengine::create(string tableName, vector<attribute> attrVect, vector<strin
 /*
 Insert a Row into a Relation
 */
-void DBengine::insert(string tableName, vector<attribute> rowData) {
+void DBengine::insert(string tableName, vector<string> rows) {
 	Relation* tempTable = NULL;
 	for (int i = 0; i < tables.size(); ++i) {
 		if (tables[i]->getName() == tableName) {
@@ -362,6 +362,10 @@ void DBengine::insert(string tableName, vector<attribute> rowData) {
 
 	vector<string> keys = tempTable->keyParameters;
 	vector<attribute> attributes = tempTable->attributes;
+	vector<attribute> rowData = tempTable->attributes;
+	for (int i = 0; i < rows.size(); ++i) {
+		rowData[i].entryData = rows[i];
+	}
 	string primaryKey = "";
 	// Sets primary key for new row
 	for (int j = 0; j < keys.size(); ++j) {
@@ -371,15 +375,20 @@ void DBengine::insert(string tableName, vector<attribute> rowData) {
 			}
 		}
 	}
-	// Check if row data matches the type and name of the column they are inserted into
+	/* Check if row data matches the type and name of the column they are inserted into
 	for (int j = 0; j < rowData.size(); ++j) {
 		if (!(rowData[j].attributeType.compare(attributes[j].attributeType) == 0 && 
 				rowData[j].attributeName.size() <= attributes[j].attributeSize)) {
 			// This will be an error
-			return;
 		}
-		else tempTable->addRow(primaryKey);
+		else continue;
+	}*/
+
+	tempTable->addRow(Row(tempTable, primaryKey, tempTable->getColumnNames()));
+	for (int i = 0; i < rowData.size(); ++i) {
+		tempTable->getRow(tempTable->getSize() - 1).set(rowData[i].attributeName, rowData[i].entryData);
 	}
+	tempTable->getRow(tempTable->getSize() - 1).set("key", primaryKey);
 }
 
 /*
@@ -551,6 +560,7 @@ istream& operator>>(istream& in, Relation& table) {
 			line.erase(0, pos + delimiter.length());
 		}
 		if (line.size() != 0) tempData.push_back(line);
+		if (tempData.size() == 0) break;
 		rows.push_back(Row(&table, tempData[tempData.size() - 1], table.getColumnNames()));
 		table.incrementSize();
 		for (int i = 0; i < tempData.size(); ++i) {
