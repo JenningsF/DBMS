@@ -52,6 +52,7 @@ void Relation::setColumnNames() {
 	for (int i = 0; i < attributes.size(); ++i) {
 		columnNames.push_back(attributes[i].attributeName);
 	}
+	colSize = columnNames.size();
 }
 // Add row to table
 void Relation::addRow(string primary) {
@@ -162,6 +163,21 @@ bool Row::set(string colName, T data) {
 	else return false;
 
 	return true;
+}
+
+
+template <typename T>
+void Row::set(int colIndex, T data) {
+	if (columns.size() > colIndex && colIndex >= 0) {
+		stringstream buffer;
+		buffer << data;
+		if (table->attributes[colIndex].attributeType == "string" &&
+			table->attributes[colIndex].attributeSize < buffer.str().size())
+			return;
+
+		columns[colIndex] = buffer.str();
+	}
+
 }
 
 // Add Column
@@ -436,6 +452,59 @@ bool DBengine::update(string tableName, int rowIndex, string colName, T whatToUp
 	}
 }
 
+
+string DBengine::relationCross(string ltable, string rtable){
+	Relation* ltab = new Relation();
+	Relation* rtab = new Relation();
+	for (int i = 0; i < tables.size(); ++i) {
+		if (tables[i]->getName() == ltable) ltab = tables[i];
+		else if (tables[i]->getName() == rtable) rtab = tables[i];
+	}
+	Relation* temp = (*ltab)*(*rtab);
+	temp->setName(ltable + "*" + rtable);
+	tables.push_back(temp);
+	return temp->getName();
+}
+
+
+vector<attribute> DBengine::getTableAttributes(string name) {
+	for (int i = 0; i < tables.size(); ++i) {
+		if (tables[i]->getName() == name) return tables[i]->attributes;
+	}
+}
+
+vector<string> DBengine::getTableKeys(string name) {
+	for (int i = 0; i < tables.size(); ++i) {
+		if (tables[i]->getName() == name) return tables[i]->keyParameters;
+	}
+}
+
+string DBengine::relationUnion(string ltable, string rtable) {
+	Relation* ltab = new Relation();
+	Relation* rtab = new Relation();
+	for (int i = 0; i < tables.size(); ++i) {
+		if (tables[i]->getName() == ltable) ltab = tables[i];
+		else if (tables[i]->getName() == rtable) rtab = tables[i];
+	}
+	Relation* temp = (*ltab)+(*rtab);
+	temp->setName(ltable + "+" + rtable);
+	tables.push_back(temp);
+	return temp->getName();
+}
+
+string DBengine::relationDiff(string ltable, string rtable) {
+	Relation* ltab = new Relation();
+	Relation* rtab = new Relation();
+	for (int i = 0; i < tables.size(); ++i) {
+		if (tables[i]->getName() == ltable) ltab = tables[i];
+		else if (tables[i]->getName() == rtable) rtab = tables[i];
+	}
+	Relation* temp = (*ltab)-(*rtab);
+	temp->setName(ltable + "-" + rtable);
+	tables.push_back(temp);
+	return temp->getName();
+}
+
 // Output operator outputs relation to specified .db format
 ostream& operator<<(ostream& out, Relation& table) {
 	// List attribute name type (size if string) 
@@ -519,27 +588,34 @@ Relation* operator-(Relation& ltable, Relation& rtable) {
 	else return NULL;
 }
 
-// Overloaded cross product operator for relation
-Relation* operator*(Relation& ltable, Relation& rtable) {
-	vector<attribute> attribs = ltable.attributes;
+/* Overloaded cross product operator for relation */
+Relation* Relation::operator*(Relation& rtable) {
+	vector<attribute> attribs = this->attributes;
 	for (int i = 0; i < rtable.attributes.size(); ++i) {
-		attribute temp_attrib = rtable.attributes[i];
-		temp_attrib.isPk = false;
-		attribs.push_back(temp_attrib);
+		if (rtable.attributes[i].attributeName != "key") {
+			attribute temp_attrib = rtable.attributes[i];
+			temp_attrib.isPk = false;
+			attribs.insert(attribs.end() - 1, temp_attrib);
+		}
 	}
 	Relation* table = new Relation("", attribs);
-	for (int j = 0; j < ltable.getSize(); ++j) {
+	for (int j = 0; j < this->getSize(); ++j) {
 		for (int k = 0; k < rtable.getSize(); ++k) {
-			Row temp_row(table, ltable.getRow(j));
-			temp_row.addColumns(rtable.getRow(k).getColumnNames());
-			for (int l = 0; l < rtable.getRow(k).getColumns().size(); ++l) {
-				temp_row.set(rtable.getRow(k).getColumnNames()[l], rtable.getRow(k).getColumns()[l]);
+			Row temp_row(table, this->getRow(j));
+			vector<string> colnames = rtable.getRow(k).getColumnNames();
+			if (colnames[colnames.size() - 1] == "key") colnames.erase(colnames.end()-1);
+			temp_row.addColumns(colnames);
+			for (int l = 0; l < rtable.getRow(k).getColumns().size() - 1; ++l) {
+				temp_row.set(getColumnSize() + l, rtable.getRow(k).getColumns()[l]);
 			}
 			table->addRow(temp_row);
 		}
 	}
+	table->keyParameters = keyParameters;
+	table->colSize = table->getRow(0).columns.size();
 	return table;
 }
+
 
 // Input operator loads a relation from input file
 istream& operator>>(istream& in, Relation& table) {

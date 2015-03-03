@@ -55,7 +55,12 @@ int main(int argc, char const *argv[]) {
 					break;
 				case eDiff:
 					break;
-				case eCross:
+				case eCross:					
+					if (i != 0) {
+						query[i - 1].fromName = DB.relationCross(query[i].viewName, query[i].fromName);
+						query[i - 1].attribs = DB.getTableAttributes(query[i - 1].fromName);
+						query[i - 1].attributes = DB.getTableKeys(query[i - 1].fromName);
+					}
 					break;
 				case eRename:
 					break;

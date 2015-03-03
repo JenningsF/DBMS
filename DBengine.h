@@ -61,6 +61,8 @@ class Relation {
 		void addAttribute(attribute attrib);
 		// Remove row based on index
 		void deleteRow(int i);
+		// Overloaded cross product operator for relation
+		Relation* operator*(Relation& rtable);
 };
 
 // Row class to make up relation
@@ -85,6 +87,8 @@ class Row {
 		// Sets column data
 		template <typename T>
 		bool set(string colName, T data);
+		template <typename T>
+		void set(int colIndex, T data);
 		void setTable(Relation* t);
 		// Adder
 		void addColumn(string name);
@@ -149,6 +153,13 @@ class DBengine {
 		void del(string tableName, string colName, T rowToDel);
 		template <typename T>
 		bool update(string tableName, int rowIndex, string colName, T whatToUpdate);
+
+		vector<attribute> getTableAttributes(string name);
+		vector<string> getTableKeys(string name);
+		// Performs relational algebra and returns name of intermediate table
+		string relationUnion(string ltable, string rtable);
+		string relationCross(string ltable, string rtable);
+		string relationDiff(string ltable, string rtable);
 };
 
 #endif

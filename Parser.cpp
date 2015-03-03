@@ -61,6 +61,9 @@ void Parser::parse(string l){
 	if (last.command == eCreate || last.command == eWrite || last.command == eShow || last.command == eClose || last.command == eOpen || last.command == eInsert) {
 		if (last.viewName == "") query[query.size() - 1].command = ERROR;
 	}
+	else if (last.command == eCross || last.command == eUnion || last.command == eDiff) {
+		if (last.viewName == "" || last.fromName == "") query[query.size() - 1].command = ERROR;
+	}
 	else {
 		if (last.fromName == "") query[query.size() - 1].command = ERROR;
 	}
@@ -187,7 +190,7 @@ bool Parser::parse_select(string select_string){
 			select.attributes.push_back(select_string.substr(0, pos));
 			select_string.erase(0, pos + 2);
 		}
-		trimQuote(select.value);
+		//trimQuote(select.value);
 		query.push_back(select);
 	}
 	return ValidateSelect();
@@ -225,6 +228,7 @@ void Parser::parse_query() {
 
 	//Process Query
 	while(pos != string::npos){
+		if (line == ");") return;
 		while (line[0] == ' ' || line[0] == '(') line.erase(0, 1);
 		pos = line.find(" ");
 		string temp = line.substr(0,pos);
