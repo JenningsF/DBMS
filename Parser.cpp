@@ -451,29 +451,23 @@ void Parser::parse_delete() {
 	del.command = eDelete;
 	del.viewName = line.substr(0, line.find(' '));
 	line.erase(0, line.find("WHERE ") + 6);
-	while (true) {
-		string temp = "";
-		string temp2 = "";
-		size_t pos = line.find('=') + 4;
-		temp += line.substr(0, pos);
+	while(true)
+	{
+		pos = line.find(' ');
+		del.condition_one.push_back(line.substr(0,pos);
+		pos = line.find('\"') + 1;
 		line.erase(0, pos);
+		pos = line.find('\"');
+		del.condition_two.push_back(line.substr(0, pos));
+		line.erase(0, pos + 2);
 		pos = line.find(' ');
 		if (pos == string::npos) {
-			// No more conditions
 			pos = line.find('\0');
-			temp += line.substr(0, pos);
-			del.attributes.push_back(temp);
-			line.erase(0, pos);
+			line.erase(0,pos);
 			break;
 		}
 		else {
-			// Additional conditions expected
-			temp += line.substr(0, pos);
-			del.attributes.push_back(temp);
-			line.erase(0, pos + 1);
-			pos = line.find(" ");
-			temp2 = line.substr(0, pos);
-			del.attributes.push_back(temp2);
+			del.comparisons.push_back(0, pos);
 			line.erase(0, pos + 1);
 		}
 	}
