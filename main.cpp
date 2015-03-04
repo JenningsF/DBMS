@@ -44,7 +44,7 @@ int main(int argc, char const *argv[]) {
 					//		DB.update(parse.getViewName(), parse.getRowIndex(), parse.getColName(), parse.getData());
 					break;
 				case eDelete:
-					//		DB.del(parse.getViewName(), parse.getColName(), parse.getWhatToDel());
+					DB.del(query[i].viewName, query[i].condition_one, query[i].condition_two, query[i].comparisons);
 					break;
 				case eShow: //good
 					DB.show(query[i].viewName);

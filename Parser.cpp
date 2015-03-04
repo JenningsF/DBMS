@@ -371,7 +371,7 @@ void Parser::parse_update() {
 	while(true)
 	{
 		pos = line.find(' ');
-		int pos2 = line.find("WHERE");
+		size_t pos2 = line.find("WHERE");
 		if(pos2 < pos)
 		{
 			pos = line.find(' ') + 1;
@@ -391,7 +391,7 @@ void Parser::parse_update() {
 	while(true)
 	{
 		pos = line.find(' ');
-		update.condition_one.push_back(line.substr(0,pos);
+		update.condition_one.push_back(line.substr(0,pos));
 		pos = line.find('\"') + 1;
 		line.erase(0, pos);
 		pos = line.find('\"');
@@ -404,7 +404,7 @@ void Parser::parse_update() {
 			break;
 		}
 		else {
-			update.comparisons.push_back(0, pos);
+			update.comparisons.push_back(line.substr(0, pos));
 			line.erase(0, pos + 1);
 		}
 	}
@@ -447,6 +447,7 @@ void Parser::parse_insert() {
 //Parser:: parse_delete()
 //Example: DELETE FROM animals WHERE
 void Parser::parse_delete() {
+	size_t pos;
 	element del;
 	del.command = eDelete;
 	del.viewName = line.substr(0, line.find(' '));
@@ -454,7 +455,7 @@ void Parser::parse_delete() {
 	while(true)
 	{
 		pos = line.find(' ');
-		del.condition_one.push_back(line.substr(0,pos);
+		del.condition_one.push_back(line.substr(0,pos));
 		pos = line.find('\"') + 1;
 		line.erase(0, pos);
 		pos = line.find('\"');
@@ -467,7 +468,7 @@ void Parser::parse_delete() {
 			break;
 		}
 		else {
-			del.comparisons.push_back(0, pos);
+			del.comparisons.push_back(line.substr(0, pos));
 			line.erase(0, pos + 1);
 		}
 	}

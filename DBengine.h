@@ -80,8 +80,7 @@ class Row {
 		// Gets index of data related to Column Name
 		int findIndex(string colName);
 		// Get data from Row
-		template <typename T>
-		T get(string colName);
+		string get(string colName);
 		// Get Primary Key
 		string getPK();
 		// Sets column data
@@ -149,8 +148,7 @@ class DBengine {
 		void output();
 		void create(string tableName, vector<attribute> attrVect, vector<string> primaryKeys);
 		void insert(string tableName, vector<string> rowData);
-		template <typename T>
-		void del(string tableName, string colName, T rowToDel);
+		bool del(string tableName, vector<string> condition_one, vector<string> condition_two, vector<string> comparisons);
 		template <typename T>
 		bool update(string tableName, int rowIndex, string colName, T whatToUpdate);
 

@@ -63,7 +63,7 @@ struct element {
 	string fromName;
 	string_command command;
 	string query_type;
-	vetor<string> column; 
+	vector<string> column; 
 	vector<string> value;
 	vector<string> condition_one;
 	vector<string> comparisons;

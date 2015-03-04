@@ -127,16 +127,15 @@ int Row::findIndex(string colName) {
 }
 
 // Get data from Row
-template <typename T>
-T Row::get(string colName) {
+string Row::get(string colName) {
 	int index = findIndex(colName);
 	if (columns.size() > index && index != -1) {
 		if (table->attributes[index].attributeType == "string")
 			return columns[index];
 		else if (table->attributes[index].attributeType == "int")
-			return atoi(columns[index].c_str());
+			return columns[index];
 		else if (table->attributes[index].attributeType == "double")
-			return atof(columns[index].c_str());
+			return columns[index];
 	}
 	else throw ColumnNotFound();
 }
@@ -307,45 +306,45 @@ void DBengine::show(string tableName) {
 Selects a portion or an entire Relation and creates a view with selected data
 Note: Does not create file unless create/write function is called
 */
-template <typename T>
-Relation* DBengine::select(string tableName, vector<string> colNames, char allTableIndicator) {
-	Relation* tempTable;
-	for (int i = 0; i < tables.size(); ++i) {
-		if (tables[i]->getName() == tableName) 
-			tempTable = tables[i];
-	}
-	if (allTableIndicator == '*') {
-		Relation* wholeTable = new Relation(tempTable->getName(), tempTable->attributes);
-		return wholeTable;
-	}
-	else {
-		vector<Row> rows = tempTable->getRows();
-		vector<attribute> tempAttributes = tempTable->attributes;
-		vector<attribute> newAttributes;
-		// Iterate through both column name vectors to find matches
-		for (int j = 0; j < colNames.size(); ++j) {
-			for (int k = 0; k < tempAttributes.size(); ++k) {
-				if (colNames[j].compare(tempAttributes[k].attributeName) == 0) {
-					newAttributes.push_back(tempAttributes[k]);
-				}
-			}
-		}
-		Relation* newRel = new Relation(tableName, newAttributes);
-		newRel->setColumnNames();
-		newRel->setRows(rows);
-		vector<Row> newRows = newRel->getRows();
-		vector<string> newColumns = newRel->getColumnNames();
-		// Sets row data
-		for (int m = 0; m < newRel->getColumnSize(); ++m) {
-			for (int n = 0; n < newRel->getSize(); ++n) {
-				//T data = rows[n].get(newColumns[m]);
-				string data = string(rows[n].get<string>(newColumns[m]));
-				newRows[n].set(newColumns[m], data);
-			}
-		}
-		return newRel;
-	}
-}
+// template <typename T>
+// Relation* DBengine::select(string tableName, vector<string> colNames, char allTableIndicator) {
+	// Relation* tempTable;
+	// for (int i = 0; i < tables.size(); ++i) {
+		// if (tables[i]->getName() == tableName) 
+			// tempTable = tables[i];
+	// }
+	// if (allTableIndicator == '*') {
+		// Relation* wholeTable = new Relation(tempTable->getName(), tempTable->attributes);
+		// return wholeTable;
+	// }
+	// else {
+		// vector<Row> rows = tempTable->getRows();
+		// vector<attribute> tempAttributes = tempTable->attributes;
+		// vector<attribute> newAttributes;
+		// // Iterate through both column name vectors to find matches
+		// for (int j = 0; j < colNames.size(); ++j) {
+			// for (int k = 0; k < tempAttributes.size(); ++k) {
+				// if (colNames[j].compare(tempAttributes[k].attributeName) == 0) {
+					// newAttributes.push_back(tempAttributes[k]);
+				// }
+			// }
+		// }
+		// Relation* newRel = new Relation(tableName, newAttributes);
+		// newRel->setColumnNames();
+		// newRel->setRows(rows);
+		// vector<Row> newRows = newRel->getRows();
+		// vector<string> newColumns = newRel->getColumnNames();
+		// // Sets row data
+		// for (int m = 0; m < newRel->getColumnSize(); ++m) {
+			// for (int n = 0; n < newRel->getSize(); ++n) {
+				// //T data = rows[n].get(newColumns[m]);
+				// string data = string(rows[n].get<string>(newColumns[m]));
+				// newRows[n].set(newColumns[m], data);
+			// }
+		// }
+		// return newRel;
+	// }
+// }
 
 /*
 -- Strictly testing --
@@ -410,8 +409,7 @@ void DBengine::insert(string tableName, vector<string> rows) {
 /*
 Delete either a Row(s), Column(s), or entire Relationfile
 */
-template <typename T>
-void DBengine::del(string tableName, string colName, T rowToDel) {
+bool DBengine::del(string tableName, vector<string> condition_one, vector<string> condition_two, vector<string> comparisons) {
 	Relation* tempTable;
 	for (int i = 0; i < tables.size(); ++i) {
 		if (tables[i]->getName() == tableName) {
@@ -419,20 +417,41 @@ void DBengine::del(string tableName, string colName, T rowToDel) {
 			break;
 		}
 	}	
+	vector<int> indeces;
+	for (int i = 0; i < tempTable->getSize(); ++i){
+		indeces.push_back(i);
+	}
 	vector<Row> rows = tempTable->getRows();
-	// '*' signals to delete entire table
-	if (colName.compare("*") == 0 || rowToDel == "*") {
-		for (int i = 0; i < tempTable->getSize(); ++i) {
-			tempTable->deleteRow(i);
+	for (int i = 0; i < comparisons.size() + 1; ++i) {
+		if(i > 0) {
+			if (comparisons[i-1] != "&&") {
+				cout << "Error: Invalid comparison\n";
+				return false;
+			}
+		}
+		for (int j = 0; j < indeces.size(); ++i) {
+			if(rows[indeces[j]].get(condition_one[i]) != condition_two[i]) {
+				indeces.erase(indeces.begin() + j);
+			}
 		}
 	}
-	// Delete row matching colName and the info given.
-	else for (int j = 0; j < rows.size(); ++j) {
-		string data = string(rows[j].get<string>(colName));
-		if (data == rowToDel) {
-			tempTable->deleteRow(j);
-		}
+	for (int i = 0; i < indeces.size(); ++i) {
+		tempTable->deleteRow(indeces[i]);
 	}
+	
+	// // '*' signals to delete entire table
+	// if (colName.compare("*") == 0 || rowToDel == "*") {
+		// for (int i = 0; i < tempTable->getSize(); ++i) {
+			// tempTable->deleteRow(i);
+		// }
+	// }
+	// // Delete row matching colName and the info given.
+	// else for (int j = 0; j < rows.size(); ++j) {
+		// string data = string(rows[j].get<string>(colName));
+		// if (data == rowToDel) {
+			// tempTable->deleteRow(j);
+		// }
+	// }
 }
 
 /*
