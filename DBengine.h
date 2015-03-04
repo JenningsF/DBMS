@@ -39,6 +39,7 @@ class Relation {
 		// Constructors
 		Relation();
 		Relation(string n, vector<attribute> attribs);
+		Relation(string tableName, Relation* tab);
 		// Getter functions
 		string getName();
 		int getSize();
@@ -63,6 +64,8 @@ class Relation {
 		void deleteRow(int i);
 		// Overloaded cross product operator for relation
 		Relation* operator*(Relation& rtable);
+		Relation* operator+(Relation& rtable);
+		Relation* operator-(Relation& rtable);
 };
 
 // Row class to make up relation
@@ -118,11 +121,6 @@ bool operator==(Row& lrow, Row& rrow);
 // Overloaded equality operator for attribute
 bool operator==(const attribute& lattr, const attribute& rattr);
 
-// Overloaded set union operator for relation
-Relation* operator+(Relation& ltable, Relation& rtable);
-
-// Overloaded set difference operator for relation
-Relation* operator-(Relation& ltable, Relation& rtable);
 
 class DBengine {
 	private:
@@ -143,11 +141,12 @@ class DBengine {
 		void exitEngine();
 		bool write(string fileName);
 		void show(string tableName);
+		Relation* getTable(string fromName);
 		// Sets table to relation specified by argument name
 		template <typename T>
 		Relation* select(string tableName, vector<string> colNames, char allTableIndicator);
 		void output();
-		void create(string tableName, vector<attribute> attrVect, vector<string> primaryKeys);
+		void create(string tableName, vector<attribute> attrVect, vector<string> primaryKeys, string fromName);
 		void insert(string tableName, vector<string> rowData);
 		template <typename T>
 		void del(string tableName, string colName, T rowToDel);

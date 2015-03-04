@@ -391,7 +391,7 @@ void Parser::parse_update() {
 		string temp2 = "";
 		pos = line.find('==') + 3; 
 		int pos2 = line.find('!=') + 3;
-		if (pos2 < pos) { pos = pos2; )
+		if (pos2 < pos) { pos = pos2; } 
 		temp += line.substr(0, pos);
 		line.erase(0,pos);
 		pos = line.find(' ');

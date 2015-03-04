@@ -32,7 +32,7 @@ int main(int argc, char const *argv[]) {
 					DB.insert(query[i].viewName, query[i].attributes);
 					break;
 				case eCreate: //good
-					DB.create(query[i].viewName, query[i].attribs, query[i].attributes);
+					DB.create(query[i].viewName, query[i].attribs, query[i].attributes, query[i].fromName);
 					break;
 				case eWrite: //good
 					DB.write(query[i].viewName);
@@ -52,8 +52,20 @@ int main(int argc, char const *argv[]) {
 				case eSelect:
 					break;
 				case eUnion:
+					if (i != 0) {
+						query[i - 1].fromName = DB.relationUnion(query[i].viewName, query[i].fromName);
+						query[i - 1].attribs = DB.getTableAttributes(query[i - 1].fromName);
+						query[i - 1].attributes = DB.getTableKeys(query[i - 1].fromName);
+					}
+					break;
 					break;
 				case eDiff:
+					if (i != 0) {
+						query[i - 1].fromName = DB.relationDiff(query[i].viewName, query[i].fromName);
+						query[i - 1].attribs = DB.getTableAttributes(query[i - 1].fromName);
+						query[i - 1].attributes = DB.getTableKeys(query[i - 1].fromName);
+					}
+					break;
 					break;
 				case eCross:					
 					if (i != 0) {
