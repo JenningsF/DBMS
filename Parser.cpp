@@ -358,13 +358,8 @@ void Parser::parse_create(){
 	query.push_back(create);
 }
 
-//UPDATE animals Set kind = "dog" WHERE name == "Joe"
-//ViewName = animals
-//column = kind
-//valu = dog
-//name == "joe"
-//&&
-//name == "whew"
+//UPDATE animals SET kind = "dog" WHERE name == "Joe" && sodf == "asdf"
+//       viewName    column  value      c1        c2  comp
 void Parser::parse_update() {
 	element update;
 	update.command = eUpdate;
@@ -372,46 +367,45 @@ void Parser::parse_update() {
 	update.viewName = line.substr(0, pos);
 	pos += 1;
 	line.erase(0,pos);
-	pos = line.find(' ') + 1;
-	line.erase(0, pos);
-	pos = line.find(' ');
-	update.column.push_back(line.substr(0, pos));
-	pos = line.find('\"') + 1;
-	line.erase(0,pos);
-	pos = line.find('\"');
-	update.value.push_back(line.substr(0, pos));
-	pos += 2;
-	line.erase(0, pos);
-	pos = line.find(' ') + 1;
-	line.erase(0, pos);
-	//WHERE something == LSLS
+	line.erase(0,line.find(' ') + 1);
 	while(true)
 	{
-		string temp = "";
-		string temp2 = "";
-		pos = line.find('==') + 3; 
-		int pos2 = line.find('!=') + 3;
-		if (pos2 < pos) { pos = pos2; } 
-		temp += line.substr(0, pos);
-		line.erase(0,pos);
+		pos = line.find(' ');
+		int pos2 = line.find("WHERE");
+		if(pos2 < pos)
+		{
+			pos = line.find(' ') + 1;
+			line.erase(0,pos);
+			break;
+		}
+		update.column.push_back(line.substr(0, pos));
+		pos = line.find('\"') + 1;
+		line.erase(0, pos);
+		pos = line.find('\"');
+		update.value.push_back(line.substr(0, pos));
+		pos += 2;
+		line.erase(0, pos);
+	}
+	//WHERE something == LSLS
+	line.erase(0,line.find(' ') + 1);
+	while(true)
+	{
+		pos = line.find(' ');
+		update.condition_one.push_back(line.substr(0,pos);
+		pos = line.find('\"') + 1;
+		line.erase(0, pos);
+		pos = line.find('\"');
+		update.condition_two.push_back(line.substr(0, pos));
+		line.erase(0, pos + 2);
 		pos = line.find(' ');
 		if (pos == string::npos) {
-			// No more conditions
 			pos = line.find('\0');
-			temp += line.substr(0, pos);
-			update.attributes.push_back(temp);
-			line.erase(0, pos);
+			line.erase(0,pos);
 			break;
 		}
 		else {
-			// Additional conditions expected
-			temp += line.substr(0,pos);
-			update.attributes.push_back(temp);
-			line.erase(0, pos+1);
-			pos = line.find(" ");
-			temp2 = line.substr(0, pos);
-			update.attributes.push_back(temp2);
-			line.erase(0, pos+1);
+			update.comparisons.push_back(0, pos);
+			line.erase(0, pos + 1);
 		}
 	}
 	query.push_back(update);
@@ -457,29 +451,23 @@ void Parser::parse_delete() {
 	del.command = eDelete;
 	del.viewName = line.substr(0, line.find(' '));
 	line.erase(0, line.find("WHERE ") + 6);
-	while (true) {
-		string temp = "";
-		string temp2 = "";
-		size_t pos = line.find('=') + 4;
-		temp += line.substr(0, pos);
+	while(true)
+	{
+		pos = line.find(' ');
+		del.condition_one.push_back(line.substr(0,pos);
+		pos = line.find('\"') + 1;
 		line.erase(0, pos);
+		pos = line.find('\"');
+		del.condition_two.push_back(line.substr(0, pos));
+		line.erase(0, pos + 2);
 		pos = line.find(' ');
 		if (pos == string::npos) {
-			// No more conditions
 			pos = line.find('\0');
-			temp += line.substr(0, pos);
-			del.attributes.push_back(temp);
-			line.erase(0, pos);
+			line.erase(0,pos);
 			break;
 		}
 		else {
-			// Additional conditions expected
-			temp += line.substr(0, pos);
-			del.attributes.push_back(temp);
-			line.erase(0, pos + 1);
-			pos = line.find(" ");
-			temp2 = line.substr(0, pos);
-			del.attributes.push_back(temp2);
+			del.comparisons.push_back(0, pos);
 			line.erase(0, pos + 1);
 		}
 	}
