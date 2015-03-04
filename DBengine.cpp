@@ -25,6 +25,16 @@ Relation::Relation(string n, vector<attribute> attribs = vector<attribute>()) {
 	 size = 0;
 }
 
+Relation::Relation(string tableName, Relation* tab)  {
+	name = tableName;
+	attributes = tab->attributes;
+	keyParameters = tab->keyParameters;
+	addRows(tab->getRows());
+	size = tab->getRows().size();
+	colSize = tab->colSize;
+	columnNames = tab->columnNames;
+}
+
 // Getter functions
 string Relation::getName() { return name; }
 int Relation::getSize() { return size; }
@@ -302,6 +312,12 @@ void DBengine::show(string tableName) {
 	}
 }
 
+Relation* DBengine::getTable(string tableName) {
+	for (int i = 0; i < tables.size(); ++i) {
+		if (tables[i]->getName() == tableName) return tables[i];
+	}
+}
+
 /*
 Selects a portion or an entire Relation and creates a view with selected data
 Note: Does not create file unless create/write function is called
@@ -356,11 +372,18 @@ void DBengine::output() {
 /*
 Initilizes a Relation object, then pushes back on tables vector
 */
-void DBengine::create(string tableName, vector<attribute> attrVect, vector<string> primaryKeys) {
-	Relation* rel = new Relation(tableName, attrVect);
-	rel->setKeyParameters(primaryKeys);
-	rel->setColumnNames();
-	tables.push_back(rel);
+void DBengine::create(string tableName, vector<attribute> attrVect, vector<string> primaryKeys, string fromName = "") {
+	if (fromName == "") {
+		Relation* rel = new Relation(tableName, attrVect);
+		rel->setKeyParameters(primaryKeys);
+		rel->setColumnNames();
+		tables.push_back(rel);
+	}
+	else {
+		Relation* rel = new Relation(tableName, getTable(fromName));
+		tables.push_back(rel);
+	}
+	
 }
 
 /*
@@ -574,25 +597,29 @@ bool operator==(const attribute& lattr, const attribute& rattr) {
 }
 
 // Overloaded set union operator for relation
-Relation* operator+(Relation& ltable, Relation& rtable) {
-	if (ltable.keyParameters == rtable.keyParameters 
-		&& ltable.attributes == rtable.attributes) 
+Relation* Relation::operator+(Relation& rtable) {
+	if (keyParameters == rtable.keyParameters 
+		&& attributes == rtable.attributes) 
 	{
-		Relation* table = new Relation("", ltable.attributes);
-		table->addRows(ltable.getRows());
+		Relation* table = new Relation("", attributes);
+		table->addRows(getRows());
 		table->addRows(rtable.getRows());
+		table->setKeyParameters(keyParameters);
+		table->columnNames = columnNames;
+		table->colSize = columnNames.size();
+		table->size = table->getRows().size();
 		return table;
 	}
 	else return NULL;
 }
 
 // Overloaded set difference operator for relation
-Relation* operator-(Relation& ltable, Relation& rtable) {	
-	if (ltable.keyParameters == rtable.keyParameters 
-		&& ltable.attributes == rtable.attributes) 
+Relation* Relation::operator-(Relation& rtable) {	
+	if (keyParameters == rtable.keyParameters 
+		&& attributes == rtable.attributes) 
 	{
-		Relation* table = new Relation("", ltable.attributes);
-		table->addRows(ltable.getRows());
+		Relation* table = new Relation("", attributes);
+		table->addRows(getRows());
 		for (int i = 0; i < rtable.getSize(); ++i) {
 			for (int j = 0; j < table->getSize(); ++j) {
 				if (rtable.getRow(i).getPK() == table->getRow(j).getPK()) {
@@ -602,6 +629,9 @@ Relation* operator-(Relation& ltable, Relation& rtable) {
 				else continue;
 			}
 		}
+		table->setKeyParameters(keyParameters);
+		table->columnNames = columnNames;
+		table->colSize = columnNames.size();
 		return table;
 	}
 	else return NULL;
