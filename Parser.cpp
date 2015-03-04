@@ -15,12 +15,6 @@ string_command hashit(string const& inString){ //string type can's be used in sw
 	if (inString == "SHOW") return eShow;
 }
 
-string_type hashtype(string const& inString){
-
-	if (inString == "VARCHAR") return eChar;
-	if (inString == "INTEGER") return eInt;
-}
-
 Parser::Parser() {
 	command = ERROR;
 }
@@ -64,6 +58,7 @@ void Parser::parse(string l){
 	else if (last.command == eCross || last.command == eUnion || last.command == eDiff) {
 		if (last.viewName == "" || last.fromName == "") query[query.size() - 1].command = ERROR;
 	}
+	else if (last.command == eExit) {}
 	else {
 		if (last.fromName == "") query[query.size() - 1].command = ERROR;
 	}
@@ -127,7 +122,7 @@ void Parser::parse_command(){
 		query.push_back(exit);
 		break;
 	default: //good
-		printf("Error: unsupported command\n");
+		cout << "Error: unsupported command\n";
 		break;
 	}
 }
@@ -339,7 +334,7 @@ void Parser::parse_create(){
 	//Parse primary key
 	pos = line.find('(');
 	if (pos == string::npos) {
-		printf("Error: failed to provide Primary Key\n");
+		cout << "Error: failed to provide Primary Key\n";
 		return;
 	}
 	pos += 1;
@@ -363,6 +358,13 @@ void Parser::parse_create(){
 	query.push_back(create);
 }
 
+//UPDATE animals Set kind = "dog" WHERE name == "Joe"
+//ViewName = animals
+//column = kind
+//valu = dog
+//name == "joe"
+//&&
+//name == "whew"
 void Parser::parse_update() {
 	element update;
 	update.command = eUpdate;
@@ -373,21 +375,23 @@ void Parser::parse_update() {
 	pos = line.find(' ') + 1;
 	line.erase(0, pos);
 	pos = line.find(' ');
-	update.column = line.substr(0, pos);
+	update.column.push_back(line.substr(0, pos));
 	pos = line.find('\"') + 1;
 	line.erase(0,pos);
 	pos = line.find('\"');
-	update.value = line.substr(0, pos);
+	update.value.push_back(line.substr(0, pos));
 	pos += 2;
 	line.erase(0, pos);
 	pos = line.find(' ') + 1;
 	line.erase(0, pos);
-	
+	//WHERE something == LSLS
 	while(true)
 	{
 		string temp = "";
 		string temp2 = "";
-		pos = line.find('=') + 3;
+		pos = line.find('==') + 3; 
+		int pos2 = line.find('!=') + 3;
+		if (pos2 < pos) { pos = pos2; )
 		temp += line.substr(0, pos);
 		line.erase(0,pos);
 		pos = line.find(' ');
