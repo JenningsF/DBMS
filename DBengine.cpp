@@ -140,11 +140,6 @@ int Row::findIndex(string colName) {
 string Row::get(string colName) {
 	int index = findIndex(colName);
 	if (columns.size() > index && index != -1) {
-		if (table->attributes[index].attributeType == "string")
-			return columns[index];
-		else if (table->attributes[index].attributeType == "int")
-			return columns[index];
-		else if (table->attributes[index].attributeType == "double")
 			return columns[index];
 	}
 	else throw ColumnNotFound();
@@ -433,7 +428,7 @@ void DBengine::insert(string tableName, vector<string> rows) {
 Delete either a Row(s), Column(s), or entire Relationfile
 */
 bool DBengine::del(string tableName, vector<string> condition_one, vector<string> condition_two, vector<string> comparisons) {
-	Relation* tempTable;
+	Relation* tempTable = NULL;
 	for (int i = 0; i < tables.size(); ++i) {
 		if (tables[i]->getName() == tableName) {
 			tempTable = tables[i];
@@ -441,10 +436,10 @@ bool DBengine::del(string tableName, vector<string> condition_one, vector<string
 		}
 	}	
 	vector<int> indeces;
-	for (int i = 0; i < tempTable->getSize(); ++i){
+	vector<Row> rows = tempTable->getRows();
+	for (int i = 0; i < rows.size(); ++i){
 		indeces.push_back(i);
 	}
-	vector<Row> rows = tempTable->getRows();
 	for (int i = 0; i < comparisons.size() + 1; ++i) {
 		if(i > 0) {
 			if (comparisons[i-1] != "&&") {
@@ -452,14 +447,18 @@ bool DBengine::del(string tableName, vector<string> condition_one, vector<string
 				return false;
 			}
 		}
-		for (int j = 0; j < indeces.size(); ++i) {
+		for (int j = 0; j < indeces.size(); ++j) {
+			if (i >= condition_one.size()) { break; }
 			if(rows[indeces[j]].get(condition_one[i]) != condition_two[i]) {
 				indeces.erase(indeces.begin() + j);
+				--j;
 			}
 		}
 	}
+	int count = 0;
 	for (int i = 0; i < indeces.size(); ++i) {
-		tempTable->deleteRow(indeces[i]);
+		tempTable->deleteRow(indeces[i]-count);
+		++count;
 	}
 	
 	// // '*' signals to delete entire table

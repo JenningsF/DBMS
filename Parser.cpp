@@ -52,7 +52,7 @@ void Parser::parse(string l){
 		parse_query();
 	}
 	element last = query[query.size() - 1];
-	if (last.command == eCreate || last.command == eWrite || last.command == eShow || last.command == eClose || last.command == eOpen || last.command == eInsert) {
+	if (last.command == eDelete || last.command == eCreate || last.command == eWrite || last.command == eShow || last.command == eClose || last.command == eOpen || last.command == eInsert) {
 		if (last.viewName == "") query[query.size() - 1].command = ERROR;
 	}
 	else if (last.command == eCross || last.command == eUnion || last.command == eDiff) {
