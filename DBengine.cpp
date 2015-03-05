@@ -446,31 +446,42 @@ void DBengine::insert(string tableName, vector<string> rows) {
 	tempTable->getRow(tempTable->getSize() - 1).set("key", primaryKey);
 }
 
+
 /*
 Delete either a Row(s), Column(s), or entire Relationfile
 */
-template <typename T>
-void DBengine::del(string tableName, string colName, T rowToDel) {
-	Relation* tempTable;
+bool DBengine::del(string tableName, vector<string> condition_one, vector<string> condition_two, vector<string> comparisons) {
+	Relation* tempTable = NULL;
 	for (int i = 0; i < tables.size(); ++i) {
 		if (tables[i]->getName() == tableName) {
 			tempTable = tables[i];
 			break;
 		}
 	}	
+	vector<int> indeces;
 	vector<Row> rows = tempTable->getRows();
-	// '*' signals to delete entire table
-	if (colName.compare("*") == 0 || rowToDel == "*") {
-		for (int i = 0; i < tempTable->getSize(); ++i) {
-			tempTable->deleteRow(i);
+	for (int i = 0; i < rows.size(); ++i){
+		indeces.push_back(i);
+	}
+	for (int i = 0; i < comparisons.size() + 1; ++i) {
+		if(i > 0) {
+			if (comparisons[i-1] != "&&") {
+				cout << "Error: Invalid comparison\n";
+				return false;
+			}
+		}
+		for (int j = 0; j < indeces.size(); ++j) {
+			if (i >= condition_one.size()) { break; }
+			if(rows[indeces[j]].get(condition_one[i]) != condition_two[i]) {
+				indeces.erase(indeces.begin() + j);
+				--j;
+			}
 		}
 	}
-	// Delete row matching colName and the info given.
-	else for (int j = 0; j < rows.size(); ++j) {
-		string data = string(rows[j].get<string>(colName));
-		if (data == rowToDel) {
-			tempTable->deleteRow(j);
-		}
+	int count = 0;
+	for (int i = 0; i < indeces.size(); ++i) {
+		tempTable->deleteRow(indeces[i]-count);
+		++count;
 	}
 }
 
