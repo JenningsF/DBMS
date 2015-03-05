@@ -9,9 +9,12 @@
 
 #ifndef _DBEngine_
 #define _DBEngine_1
+#include <algorithm>
 #include <cstdlib>
+#include <ctime>
 #include <iostream>
 #include <fstream>
+#include <cstdlib>
 #include <string>
 #include <sstream>
 #include <stdlib.h>
@@ -141,13 +144,14 @@ class DBengine {
 		bool write(string fileName);
 		void show(string tableName);
 		Relation* getTable(string fromName);
+		bool tableExists(string tableName);
 		// Sets table to relation specified by argument name
-		template <typename T>
-		Relation* select(string tableName, vector<string> colNames, char allTableIndicator);
+		string select(string tableName, vector<string> colNames);
 		void output();
 		void create(string tableName, vector<attribute> attrVect, vector<string> primaryKeys, string fromName);
 		void insert(string tableName, vector<string> rowData);
-		bool del(string tableName, vector<string> condition_one, vector<string> condition_two, vector<string> comparisons);
+		template <typename T>
+		void del(string tableName, string colName, T rowToDel);
 		template <typename T>
 		bool update(string tableName, int rowIndex, string colName, T whatToUpdate);
 

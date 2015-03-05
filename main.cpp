@@ -44,12 +44,17 @@ int main(int argc, char const *argv[]) {
 					//		DB.update(parse.getViewName(), parse.getRowIndex(), parse.getColName(), parse.getData());
 					break;
 				case eDelete:
-					DB.del(query[i].viewName, query[i].condition_one, query[i].condition_two, query[i].comparisons);
+					//		DB.del(parse.getViewName(), parse.getColName(), parse.getWhatToDel());
 					break;
 				case eShow: //good
 					DB.show(query[i].viewName);
 					break;
 				case eSelect:
+					if (i != 0) {
+						query[i - 1].fromName = DB.select(query[i].fromName, query[i].attributes);
+						query[i - 1].attribs = DB.getTableAttributes(query[i - 1].fromName);
+						query[i - 1].attributes = DB.getTableKeys(query[i - 1].fromName);
+					}
 					break;
 				case eUnion:
 					if (i != 0) {
@@ -58,14 +63,12 @@ int main(int argc, char const *argv[]) {
 						query[i - 1].attributes = DB.getTableKeys(query[i - 1].fromName);
 					}
 					break;
-					break;
 				case eDiff:
 					if (i != 0) {
 						query[i - 1].fromName = DB.relationDiff(query[i].viewName, query[i].fromName);
 						query[i - 1].attribs = DB.getTableAttributes(query[i - 1].fromName);
 						query[i - 1].attributes = DB.getTableKeys(query[i - 1].fromName);
 					}
-					break;
 					break;
 				case eCross:					
 					if (i != 0) {
@@ -75,8 +78,10 @@ int main(int argc, char const *argv[]) {
 					}
 					break;
 				case eRename:
+
 					break;
 				case eProject:
+
 					break;
 				case ERROR:
 				default:

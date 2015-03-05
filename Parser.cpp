@@ -52,7 +52,7 @@ void Parser::parse(string l){
 		parse_query();
 	}
 	element last = query[query.size() - 1];
-	if (last.command == eDelete || last.command == eCreate || last.command == eWrite || last.command == eShow || last.command == eClose || last.command == eOpen || last.command == eInsert) {
+	if (last.command == eCreate || last.command == eWrite || last.command == eShow || last.command == eClose || last.command == eOpen || last.command == eInsert) {
 		if (last.viewName == "") query[query.size() - 1].command = ERROR;
 	}
 	else if (last.command == eCross || last.command == eUnion || last.command == eDiff) {
@@ -265,8 +265,10 @@ void Parser::parse_query() {
 				else if (line[minimum] == '*') algebra.command = eCross;
 				line.erase(0, minimum + 2);
 				pos_end = min(line.find(';'), line.find(')'));
-				algebra.fromName = line.substr(0, pos_end);
-				line.erase(0, pos_end);
+				if (pos_end < line.find('(')) {
+					algebra.fromName = line.substr(0, pos_end);
+					line.erase(0, pos_end);
+				}
 				query.push_back(algebra);
 			}
 		}
@@ -371,7 +373,7 @@ void Parser::parse_update() {
 	while(true)
 	{
 		pos = line.find(' ');
-		size_t pos2 = line.find("WHERE");
+		int pos2 = line.find("WHERE");
 		if(pos2 < pos)
 		{
 			pos = line.find(' ') + 1;
@@ -448,12 +450,13 @@ void Parser::parse_insert() {
 //Example: DELETE FROM animals WHERE
 void Parser::parse_delete() {
 	element del;
+	size_t pos = 0;
 	del.command = eDelete;
 	del.viewName = line.substr(0, line.find(' '));
 	line.erase(0, line.find("WHERE ") + 6);
 	while(true)
 	{
-		size_t pos = line.find(' ');
+		pos = line.find(' ');
 		del.condition_one.push_back(line.substr(0,pos));
 		pos = line.find('\"') + 1;
 		line.erase(0, pos);
@@ -473,3 +476,4 @@ void Parser::parse_delete() {
 	}
 	query.push_back(del);
 }
+
