@@ -152,8 +152,8 @@ class DBengine {
 		void create(string tableName, vector<attribute> attrVect, vector<string> primaryKeys, string fromName);
 		void insert(string tableName, vector<string> rowData);
 		bool del(string tableName, vector<string> condition_one, vector<string> condition_two, vector<string> comparisons);
-		template <typename T>
-		bool update(string tableName, int rowIndex, string colName, T whatToUpdate);
+		bool update(string tableName, vector<string> columnNames, vector<string> values,
+						vector<string> conditionOne, vector<string> conditionTwo, vector<string> comparisons);
 
 		vector<attribute> getTableAttributes(string name);
 		vector<string> getTableKeys(string name);

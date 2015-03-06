@@ -41,7 +41,8 @@ int main(int argc, char const *argv[]) {
 					DB.exitEngine();
 					return 0;
 				case eUpdate:
-					//		DB.update(parse.getViewName(), parse.getRowIndex(), parse.getColName(), parse.getData());
+					DB.update(query[i].viewName, query[i].column, query[i].value,
+								query[i].condition_one, query[i].condition_two, query[i].comparisons);
 					break;
 				case eDelete:
 					DB.del(query[i].viewName, query[i].condition_one, query[i].condition_two, query[i].comparisons);

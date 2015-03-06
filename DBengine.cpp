@@ -526,18 +526,56 @@ bool DBengine::del(string tableName, vector<string> condition_one, vector<string
 /*
 Changes specified data whether it be a certain cell, row, or column
 */
-template <typename T>
-bool DBengine::update(string tableName, int rowIndex, string colName, T whatToUpdate) {
+bool DBengine::update(string tableName, vector<string> columnNames, vector<string> values,
+						vector<string> conditionOne, vector<string> conditionTwo, vector<string> comparisons) {
+	Relation* tempTable;
 	for (int i = 0; i < tables.size(); ++i) {
 		if (tables[i]->getName() == tableName) {
-			Relation* tempTable = tables[i];
+			tempTable = tables[i];
 			break;
 		}
 	}
-	Row changedRow = table->getRow(rowIndex);
-	if (changedRow.set(colName, whatToUpdate)) {
-		return true;
+	// Checks if condition and comparisons contain complete bool statements
+	if (!(conditionOne.size() == conditionTwo.size() && comparisons.size() == conditionOne.size() - 1)) {
+		return false;
 	}
+
+	vector<Row> tempRows = tempTable->getRows();
+	vector<int> goodRowIndexes;	// Keeps indexes of each row that meets criteria
+	for (int j = 0; j < tempRows.size(); ++j) {
+		goodRowIndexes.push_back(j);
+	}
+
+	for (int k = 0; k < comparisons.size() + 1; ++k) {
+		for (int l = 0; l < tempRows.size(); ++l) {
+			if (!(tempRows[l].get(conditionOne[k]) == conditionTwo[k])) {
+				tempRows.erase(tempRows.begin() + l);
+				goodRowIndexes.erase(goodRowIndexes.begin() + l);
+			}
+		}
+		// Excludes rows that do not meet all criteria if there's more than one
+		if (k > 0 && comparisons[k - 1] == "&&") {
+			for (int m = 0; m < tempRows.size(); ++m) {
+				if (!(tempRows[m].get(conditionOne[k - 1]) == conditionTwo[k - 1] && tempRows[m].get(conditionOne[k]) == conditionTwo[k])) {
+					tempRows.erase(tempRows.begin() + m);
+					goodRowIndexes.erase(goodRowIndexes.begin() + m);
+				}
+			}
+		}
+	}
+
+	// Checks if columnNames and values are paired
+	if (!(columnNames.size() == values.size())) {
+		return false;
+	}
+
+	for (int n = 0; n < columnNames.size(); ++n) {
+		for (int q = 0; q < goodRowIndexes.size(); ++q) {
+			tempTable->getRow(q).set(columnNames[n], values[n]);
+		}
+	}
+
+	return true;
 }
 
 

@@ -360,8 +360,18 @@ void Parser::parse_create(){
 	query.push_back(create);
 }
 
-//UPDATE animals SET kind = "dog" WHERE name == "Joe" && sodf == "asdf"
-//       viewName    column  value      c1        c2  comp
+/*
+EXAMPLE: UPDATE animals SET kind = "dog" WHERE name == "Joe" && years == "4"
+Key info is stored in an element object:
+animals -> viewName
+kind -> column
+dog -> value
+name -> condition_one
+Joe -> condition_two
+&& -> comparisons
+years -> condition_one
+4 -> condition_two
+*/
 void Parser::parse_update() {
 	element update;
 	update.command = eUpdate;
@@ -373,7 +383,7 @@ void Parser::parse_update() {
 	while(true)
 	{
 		pos = line.find(' ');
-		int pos2 = line.find("WHERE");
+		size_t pos2 = line.find("WHERE");
 		if(pos2 < pos)
 		{
 			pos = line.find(' ') + 1;
