@@ -81,7 +81,11 @@ int main(int argc, char const *argv[]) {
 
 					break;
 				case eProject:
-
+					if (i != 0) {
+						query[i - 1].fromName = DB.project(query[i].fromName, query[i].attributes);
+						query[i - 1].attribs = DB.getTableAttributes(query[i - 1].fromName);
+						query[i - 1].attributes = DB.getTableKeys(query[i - 1].fromName);
+					}
 					break;
 				case ERROR:
 				default:

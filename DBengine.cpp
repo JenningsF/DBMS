@@ -22,6 +22,7 @@ Relation::Relation() : name("") {}
 Relation::Relation(string n, vector<attribute> attribs = vector<attribute>()) {
 	 name = n;
 	 attributes = attribs;
+	 colSize = attribs.size();
 	 size = 0;
 }
 
@@ -40,7 +41,7 @@ string Relation::getName() { return name; }
 int Relation::getSize() { return size; }
 int Relation::getColumnSize() { return colSize; }
 vector<string> Relation::getColumnNames() { return columnNames; }
-const vector<Row> Relation::getRows() { return rows; }
+vector<Row> Relation::getRows() { return rows; }
 Row& Relation::getRow(int i) { 
 	if (i < size && i > -1)
 		return rows[i];
@@ -378,6 +379,43 @@ string DBengine::select(string tableName, vector<string> colNames) {
 	tables.push_back(tempTable);
 	return tempTable->getName();
 }
+
+// Projects specified column names from the specified table to a new table.
+string DBengine::project(string tableName, vector<string> colNames) {
+	srand(time(NULL));
+	int raNum = 0;
+	string newName = tableName + "Project";
+	while (tableExists(newName)) {
+		raNum = rand() % 10;
+		newName += raNum;
+	}
+	bool contains = false;
+	for (int i = 0; i < colNames.size(); ++i) {
+		if (colNames[i] == "key") contains = true;
+	}
+	if (!contains) colNames.push_back("key");
+	vector<attribute> temp = getTable(tableName)->attributes;
+	vector<attribute> newAttribs;
+	for (int i = 0; i < temp.size(); ++i) {
+		for (int j = 0; j < colNames.size(); ++j) {
+			if (colNames[j] == temp[i].attributeName) newAttribs.push_back(temp[i]);
+		}
+	}
+	Relation* tempTable = new Relation(newName, newAttribs);
+	vector<Row> rows = getTable(tableName)->getRows();
+	vector<Row> newRows;
+	for (int i = 0; i < rows.size(); ++i) {
+		newRows.push_back(Row(tempTable, rows[i].getPK(), colNames));
+		for (int j = 0; j < colNames.size(); ++j) {
+			string data = rows[i].get(colNames[j]);
+			newRows[newRows.size() - 1].set(colNames[j], data);
+		}
+	}
+	tempTable->setRows(newRows);
+	tables.push_back(tempTable);
+	return tempTable->getName();
+}
+
 
 /*
 -- Strictly testing --

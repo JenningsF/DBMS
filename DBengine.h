@@ -48,7 +48,7 @@ class Relation {
 		int getSize();
 		int getColumnSize();
 		vector<string> getColumnNames();
-		const vector<Row> getRows();
+		vector<Row> getRows();
 		Row& getRow(int i);
 		// Setter functions
 		void setName(string n);
@@ -147,6 +147,7 @@ class DBengine {
 		bool tableExists(string tableName);
 		// Sets table to relation specified by argument name
 		string select(string tableName, vector<string> colNames);
+		string project(string tableName, vector<string> colNames);
 		void output();
 		void create(string tableName, vector<attribute> attrVect, vector<string> primaryKeys, string fromName);
 		void insert(string tableName, vector<string> rowData);
