@@ -70,6 +70,8 @@ struct element {
 	vector<string> condition_two;
 	vector<string> attributes;
 	vector<attribute> attribs;
+	vector<attribute> tableAttribs;
+	vector<string> tableAttributes;
 };
 
 #endif

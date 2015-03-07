@@ -331,7 +331,7 @@ void Parser::parse_create(){
 		}
 		//create and insert attribute
 		attribute temp(name, type, false, size);
-		create.attribs.push_back(temp);
+		create.tableAttribs.push_back(temp);
 	}
 	//Parse primary key
 	pos = line.find('(');
@@ -355,7 +355,7 @@ void Parser::parse_create(){
 			pos += 2;
 			line.erase(0, pos);
 		}
-		create.attributes.push_back(key);
+		create.tableAttributes.push_back(key);
 	}
 	query.push_back(create);
 }

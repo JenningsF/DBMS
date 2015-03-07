@@ -185,6 +185,10 @@ void Row::set(int colIndex, T data) {
 
 }
 
+void Row::setColumnNames(vector<string> colNames) {
+	columnNames = colNames;
+}
+
 // Add Column
 void Row::addColumn(string name) {
 	columnNames.push_back(name);
@@ -417,6 +421,34 @@ string DBengine::project(string tableName, vector<string> colNames) {
 }
 
 
+string DBengine::rename(string tableName, vector<string> colNames) {
+	srand(time(NULL));
+	int raNum = 0;
+	string newName = tableName + "Rename";
+	while (tableExists(newName)) {
+		raNum = rand() % 10;
+		newName += raNum;
+	}
+	bool contains = false;
+	for (int i = 0; i < colNames.size(); ++i) {
+		if (colNames[i] == "key") contains = true;
+	}
+	if (!contains) colNames.push_back("key");
+	vector<attribute> attribs = getTable(tableName)->attributes;
+	vector<Row> rows = getTable(tableName)->getRows();
+	for (int i = 0; i < colNames.size(); ++i) {
+		attribs[i].attributeName = colNames[i];
+	}
+	for (int j = 0; j < rows.size(); ++j) {
+		rows[j].setColumnNames(colNames);
+	}
+	Relation* tempTable = new Relation(newName, attribs);
+	tempTable->addRows(rows);
+	tables.push_back(tempTable);
+	return tempTable->getName();
+}
+
+
 /*
 -- Strictly testing --
 */
@@ -528,7 +560,7 @@ Changes specified data whether it be a certain cell, row, or column
 */
 bool DBengine::update(string tableName, vector<string> columnNames, vector<string> values,
 						vector<string> conditionOne, vector<string> conditionTwo, vector<string> comparisons) {
-	Relation* tempTable;
+	Relation* tempTable = 0;
 	for (int i = 0; i < tables.size(); ++i) {
 		if (tables[i]->getName() == tableName) {
 			tempTable = tables[i];

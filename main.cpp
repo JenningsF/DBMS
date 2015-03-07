@@ -9,6 +9,7 @@
 #include "DBengine.h"
 #include "Parser.h"
 #include <iostream>
+#include <sstream>
 
 using namespace std;
 
@@ -32,7 +33,7 @@ int main(int argc, char const *argv[]) {
 					DB.insert(query[i].viewName, query[i].attributes);
 					break;
 				case eCreate: //good
-					DB.create(query[i].viewName, query[i].attribs, query[i].attributes, query[i].fromName);
+					DB.create(query[i].viewName, query[i].tableAttribs, query[i].tableAttributes, query[i].fromName);
 					break;
 				case eWrite: //good
 					DB.write(query[i].viewName);
@@ -53,39 +54,43 @@ int main(int argc, char const *argv[]) {
 				case eSelect:
 					if (i != 0) {
 						query[i - 1].fromName = DB.select(query[i].fromName, query[i].attributes);
-						query[i - 1].attribs = DB.getTableAttributes(query[i - 1].fromName);
-						query[i - 1].attributes = DB.getTableKeys(query[i - 1].fromName);
+						query[i - 1].tableAttribs = DB.getTableAttributes(query[i - 1].fromName);
+						query[i - 1].tableAttributes = DB.getTableKeys(query[i - 1].fromName);
 					}
 					break;
 				case eUnion:
 					if (i != 0) {
 						query[i - 1].fromName = DB.relationUnion(query[i].viewName, query[i].fromName);
-						query[i - 1].attribs = DB.getTableAttributes(query[i - 1].fromName);
-						query[i - 1].attributes = DB.getTableKeys(query[i - 1].fromName);
+						query[i - 1].tableAttribs = DB.getTableAttributes(query[i - 1].fromName);
+						query[i - 1].tableAttributes = DB.getTableKeys(query[i - 1].fromName);
 					}
 					break;
 				case eDiff:
 					if (i != 0) {
 						query[i - 1].fromName = DB.relationDiff(query[i].viewName, query[i].fromName);
-						query[i - 1].attribs = DB.getTableAttributes(query[i - 1].fromName);
-						query[i - 1].attributes = DB.getTableKeys(query[i - 1].fromName);
+						query[i - 1].tableAttribs = DB.getTableAttributes(query[i - 1].fromName);
+						query[i - 1].tableAttributes = DB.getTableKeys(query[i - 1].fromName);
 					}
 					break;
 				case eCross:					
 					if (i != 0) {
 						query[i - 1].fromName = DB.relationCross(query[i].viewName, query[i].fromName);
-						query[i - 1].attribs = DB.getTableAttributes(query[i - 1].fromName);
-						query[i - 1].attributes = DB.getTableKeys(query[i - 1].fromName);
+						query[i - 1].tableAttribs = DB.getTableAttributes(query[i - 1].fromName);
+						query[i - 1].tableAttributes = DB.getTableKeys(query[i - 1].fromName);
 					}
 					break;
 				case eRename:
-
+					if (i != 0) {
+						query[i - 1].fromName = DB.rename(query[i].fromName, query[i].attributes);
+						query[i - 1].tableAttribs = DB.getTableAttributes(query[i - 1].fromName);
+						query[i - 1].tableAttributes = DB.getTableKeys(query[i - 1].fromName);
+					}
 					break;
 				case eProject:
 					if (i != 0) {
 						query[i - 1].fromName = DB.project(query[i].fromName, query[i].attributes);
-						query[i - 1].attribs = DB.getTableAttributes(query[i - 1].fromName);
-						query[i - 1].attributes = DB.getTableKeys(query[i - 1].fromName);
+						query[i - 1].tableAttribs = DB.getTableAttributes(query[i - 1].fromName);
+						query[i - 1].tableAttributes = DB.getTableKeys(query[i - 1].fromName);
 					}
 					break;
 				case ERROR:

@@ -95,6 +95,7 @@ class Row {
 		template <typename T>
 		void set(int colIndex, T data);
 		void setTable(Relation* t);
+		void setColumnNames(vector<string> colNames);
 		// Adder
 		void addColumn(string name);
 		void addColumns(vector<string> names);
@@ -148,6 +149,7 @@ class DBengine {
 		// Sets table to relation specified by argument name
 		string select(string tableName, vector<string> colNames);
 		string project(string tableName, vector<string> colNames);
+		string rename(string tableName, vector<string> colNames);
 		void output();
 		void create(string tableName, vector<attribute> attrVect, vector<string> primaryKeys, string fromName);
 		void insert(string tableName, vector<string> rowData);
