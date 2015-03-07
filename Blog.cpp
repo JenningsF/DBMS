@@ -10,7 +10,15 @@ using namespace std;
 
 // Constructors
 Post::Post() : title(""), author(""), content(""), allowComments(false), date(""), postId(-1), parentId(-1) {}
-Post::Post(string ti = "", string au = "", string co = "", string day = "", bool allow = false, int post = -1, int parent = -1);
+Post::Post(string ti = "", string au = "", string co = "", string day = "", bool allow = false, int post = -1, int parent = -1) {
+	title = ti;
+	author = au;
+	content = co;
+	date = day;
+	allowComments = allow;
+	postId = post;
+	parentId = parent;
+}
 // Setters
 void Post::setTitle(string ti) {title = ti;}
 void Post::setAuthor(string au) {author = au;}
