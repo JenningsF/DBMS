@@ -129,7 +129,7 @@ class Blog {
 			}
 			else cout << "No Posts Found\n\n";
 		}
-
+		/*
 		void searchTags(string tags) {
 			// Must parse argument for multiple tags
 			for (int i = 0; i < posts.size(); ++i) {
@@ -142,7 +142,7 @@ class Blog {
 			}
 			else cout << "No Posts Found\n\n";
 		}
-
+		*/
 		void searchDate(string day) {
 			for (int i = 0; i < posts.size(); ++i) {
 				if (posts[i].getDatePosted() == day)
@@ -178,7 +178,7 @@ class Blog {
 					cout << "* Enter tags (seperated by commas): ";
 					cin >> searchFor;
 					cout << endl;
-					searchTags(searchFor);
+					//searchTags(searchFor);
 					break;
 				case '4':
 					cout << "* Enter date: ";
