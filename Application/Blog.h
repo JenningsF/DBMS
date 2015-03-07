@@ -52,7 +52,6 @@ class Blog {
 		    searchMenu = "[Search Menu]\n\nSearch by:\n1. Author\n2. Title\n3. Tag(s)\n4. Date\n5. Return to Main Menu\n\n";
 		    postMenu = "1. View\n2. Edit\n3. Delete\n4. Comment\n5. Return to Main Menu\n\n";
 			commandPrompt = "* Enter command: ";
-			currentPost = -1;
 			done = false;	
 		}
 
