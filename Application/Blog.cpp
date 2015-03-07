@@ -10,6 +10,15 @@ using namespace std;
 
 // Constructors
 Post::Post() : title(""), author(""), content(""), allowComments(false), date(""), postId(-1), parentId(-1) {}
+Post::Post(Post& p) {
+	title = p.title;
+	author = p.author;
+	content = p.content;
+	date = p.date;
+	allowComments = p.allowComments;
+	postId = p.postId;
+	parentId = p.parentId;
+}
 Post::Post(string ti = "", string au = "", string co = "", string day = "", bool allow = false, int post = -1, int parent = -1) {
 	title = ti;
 	author = au;
@@ -27,11 +36,13 @@ void Post::setCommenting(bool allow) {allowComments = allow;}
 void Post::setDate(string day) {date = day;}
 void Post::setPostID(int id) {postId = id;}
 void Post::setParentID(int id) {parentId = id;}
+void Post::setTags(vector<string> t) {tags = t;}
 // Getters
 string Post::getTitle() {return title;}
 string Post::getAuthor() {return author;}
 string Post::getContent() {return content;}
 string Post::getDatePosted() {return date;}
+vector<string> Post::getTags() {return tags;}
 bool Post::getCommenting() {return allowComments;}
 int Post::getPostID() {return postId;}
 int Post::getParentID() {return parentId;}
@@ -41,32 +52,15 @@ int Post::getParentID() {return parentId;}
 
 
 int main() {
-	// Command to create sample animals table
+	Blog app;
 	bool done = false;
-	string mainMenu = "[Main Menu]\n\n1. Make a new post\n2. Search for a post\n3. Exit\n\n";
-	string commandPrompt = "* Enter command: ";
 	char option = '0';
-	while (!done) {
-		cout << mainMenu << commandPrompt;
-		cin >> option;
-		switch (option) {
-			case '1':
-				cout << "\n New post selected" << endl;
-				break;
-			case '2':
-				cout << "\n Search selected" << endl;
-				break;
-			case '3':
-				cout << "\n Exit selected" << endl;
-				done = true;
-				break;
-			default:
-				cout << "\n Unknown command.." << endl;
-				break;
-		}
-	}
+
+	// Initiate Blog App
+	app.MainSequence();
 
 	cout << endl << endl << "**--**   TESTING OTHER TEAM's DBMS   **--**" << endl;
+	// Command to create sample animals table
 	DBMSParse("CREATE TABLE animals (name VARCHAR(20), kind VARCHAR(8), years INTEGER) PRIMARY KEY (name, kind);");
 
 	// Get table from DBMS 
