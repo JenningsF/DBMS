@@ -107,8 +107,10 @@ class Blog {
 
 		void searchAuthor(string name) {
 			for (int i = 0; i < posts.size(); ++i) {
-				if (posts[i].getAuthor() == name)
-					currentPosts.push_back(posts[i]);
+				if (posts[i].getAuthor() == name) {
+					Post temp(posts[i]);
+					currentPosts.push_back(temp);
+				}
 			}
 			if (currentPosts.size() > 0) {
 				cout << '[' << name << "'s Posts]\n\n";
@@ -120,8 +122,10 @@ class Blog {
 		void searchTitle(string title) {
 			char option = '0';
 			for (int i = 0; i < posts.size(); ++i) {
-				if (posts[i].getTitle() == title)
-					currentPosts.push_back(posts[i]);
+				if (posts[i].getTitle() == title){
+					Post temp(posts[i]);
+					currentPosts.push_back(temp);
+				}
 			}
 			if (currentPosts.size() > 0) {
 				cout << '[' << title << "'s Posts]\n\n";
@@ -133,8 +137,10 @@ class Blog {
 		void searchTags(string tags) {
 			// Must parse argument for multiple tags
 			for (int i = 0; i < posts.size(); ++i) {
-				//if (posts[i].getTags() == tags)
-					currentPosts.push_back(posts[i]);
+				//if (posts[i].getTags() == tags){
+					Post temp(posts[i]);
+					currentPosts.push_back(temp);
+				}
 			}
 			if (currentPosts.size() > 0) {
 				cout << '[' << tags << "'s Posts]\n\n";
@@ -145,8 +151,10 @@ class Blog {
 		*/
 		void searchDate(string day) {
 			for (int i = 0; i < posts.size(); ++i) {
-				if (posts[i].getDatePosted() == day)
-					currentPosts.push_back(posts[i]);
+				if (posts[i].getDatePosted() == day){
+					Post temp(posts[i]);
+					currentPosts.push_back(temp);
+				}
 			}
 			if (currentPosts.size() > 0) {
 				cout << '[' << day << "'s Posts]\n\n";
