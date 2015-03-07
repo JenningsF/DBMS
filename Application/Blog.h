@@ -18,7 +18,7 @@ class Post {
 		int parentId;
 	public:
 		Post();
-		Post(Post& p);
+		Post(Post p);
 		Post(string ti, string au, string co,  string day, bool allow, int post, int parent);
 		void setTitle(string ti);
 		void setAuthor(string au);
@@ -105,7 +105,7 @@ class Blog {
 			displayPost(index);
 		}
 
-		/*
+		
 		void searchAuthor(string name) {
 			for (int i = 0; i < posts.size(); ++i) {
 				if (posts[i].getAuthor() == name) {
@@ -134,10 +134,12 @@ class Blog {
 			}
 			else cout << "No Posts Found\n\n";
 		}
-		void searchTags(string tags) {
+		void searchTags(string tag) {
+			vector<string> tags;
+			tags.push_back(tag);
 			// Must parse argument for multiple tags
 			for (int i = 0; i < posts.size(); ++i) {
-				//if (posts[i].getTags() == tags){
+				if (posts[i].getTags() == tags)	{
 					Post temp(posts[i]);
 					currentPosts.push_back(temp);
 				}
@@ -161,7 +163,7 @@ class Blog {
 			}
 			else cout << "No Posts Found\n\n";
 		}
-		*/
+		
 
 		void SearchSequence() {
 			char option = '0';
@@ -174,25 +176,25 @@ class Blog {
 					cout << "* Enter author: ";
 					cin >> searchFor;
 					cout << endl;
-					//searchAuthor(searchFor);
+					searchAuthor(searchFor);
 					break;
 				case '2':
 					cout << "* Enter title: ";
 					cin >> searchFor;
 					cout << endl;
-					//searchTitle(searchFor);
+					searchTitle(searchFor);
 					break;
 				case '3':
 					cout << "* Enter tags (seperated by commas): ";
 					cin >> searchFor;
 					cout << endl;
-					//searchTags(searchFor);
+					searchTags(searchFor);
 					break;
 				case '4':
 					cout << "* Enter date: ";
 					cin >> searchFor;
 					cout << endl;
-					//searchDate(searchFor);
+					searchDate(searchFor);
 					break;
 				case '5':
 					break;

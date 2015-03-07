@@ -10,7 +10,7 @@ using namespace std;
 
 // Constructors
 Post::Post() : title(""), author(""), content(""), allowComments(false), date(""), postId(-1), parentId(-1) {}
-Post::Post(Post& p) {
+Post::Post(Post p) {
 	title = p.title;
 	author = p.author;
 	content = p.content;
