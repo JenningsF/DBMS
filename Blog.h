@@ -16,7 +16,7 @@ class Post {
 		int parentId;
 	public:
 		Post();
-		Post(string ti, string au, string co, bool allow, string day, int post, int parent);
+		Post(string ti, string au, string co,  string day, bool allow, int post, int parent);
 		void setTitle(string ti);
 		void setAuthor(string au);
 		void setContent(string co);
