@@ -43,7 +43,7 @@ int Post::getParentID() {return parentId;}
 int main() {
 	// Command to create sample animals table
 	bool done = false;
-	string mainMenu = "[Main Menu]\n\n1. Make a new post\n2. Search for a post\n3.Exit\n\n";
+	string mainMenu = "[Main Menu]\n\n1. Make a new post\n2. Search for a post\n3. Exit\n\n";
 	string commandPrompt = "* Enter command: ";
 	char option = '0';
 	while (!done) {
@@ -78,7 +78,7 @@ int main() {
 
 
 	cout << tab.getTuple(0)[0] << "  " << tab.getTuple(0)[1] << endl;
-	cout << "**--**   TESTING ENDED   **--**" << endl << endl;
+	cout << "**--**         TESTING ENDED         **--**" << endl << endl;
 
 	return 0;
 }
