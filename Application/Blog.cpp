@@ -57,7 +57,7 @@ int main() {
 	char option = '0';
 
 	// Initiate Blog App
-	app.MainSequence();
+	app.MenuSequence();
 
 	cout << endl << endl << "**--**   TESTING OTHER TEAM's DBMS   **--**" << endl;
 	// Command to create sample animals table
