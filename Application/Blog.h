@@ -81,7 +81,9 @@ class Blog {
 						break;
 					case '5':
 						break;
-					default:
+					default:					
+						cin.clear(); 
+						cin.ignore(numeric_limits<streamsize>::max(), '\n');
 						cout << "Unknown command..\n" << endl;
 						break;
 				}
@@ -117,7 +119,11 @@ class Blog {
 				cout << '[' << name << "'s Posts]\n\n";
 				displayCurrentPosts();
 			}
-			else cout << "No Posts Found\n\n";
+			else  {
+				cin.clear(); 
+				cin.ignore(numeric_limits<streamsize>::max(), '\n');
+				cout << "No Posts Found\n\n";
+			}
 		}
 
 		void searchTitle(string title) {
@@ -132,7 +138,11 @@ class Blog {
 				cout << '[' << title << "'s Posts]\n\n";
 				displayCurrentPosts();
 			}
-			else cout << "No Posts Found\n\n";
+			else {
+				cin.clear(); 
+				cin.ignore(numeric_limits<streamsize>::max(), '\n');
+				cout << "No Posts Found\n\n";
+			}
 		}
 		void searchTags(string tag) {
 			vector<string> tags;
@@ -148,7 +158,11 @@ class Blog {
 				cout << '[' << tag << "'s Posts]\n\n";
 				//displayCurrentPosts();
 			}
-			else cout << "No Posts Found\n\n";
+			else  {
+				cin.clear(); 
+				cin.ignore(numeric_limits<streamsize>::max(), '\n');
+				cout << "No Posts Found\n\n";
+			}
 		}
 		void searchDate(string day) {
 			for (int i = 0; i < posts.size(); ++i) {
@@ -161,7 +175,11 @@ class Blog {
 				cout << '[' << day << "'s Posts]\n\n";
 				displayCurrentPosts();
 			}
-			else cout << "No Posts Found\n\n";
+			else  {
+				cin.clear(); 
+				cin.ignore(numeric_limits<streamsize>::max(), '\n');
+				cout << "No Posts Found\n\n";
+			}
 		}
 		
 
@@ -199,6 +217,8 @@ class Blog {
 				case '5':
 					break;
 				default:
+					cin.clear(); 
+					cin.ignore(numeric_limits<streamsize>::max(), '\n');
 					cout << "Unknown command..\n" << endl;
 					break;
 			}
@@ -221,7 +241,9 @@ class Blog {
 						cout << "Exit selected\n" << endl;
 						done = true;
 						break;
-					default:
+					default:						
+						cin.clear(); 
+						cin.ignore(numeric_limits<streamsize>::max(), '\n');
 						cout << "Unknown command..\n" << endl;
 						break;
 				}
