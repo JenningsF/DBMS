@@ -18,7 +18,7 @@ class Post {
 		int parentId;
 	public:
 		Post();
-		Post(Post p);
+		Post(const Post& p);
 		Post(string ti, string au, string co,  string day, bool allow, int post, int parent);
 		void setTitle(string ti);
 		void setAuthor(string au);
@@ -145,7 +145,7 @@ class Blog {
 				}
 			}
 			if (currentPosts.size() > 0) {
-				cout << '[' << tags << "'s Posts]\n\n";
+				cout << '[' << tag << "'s Posts]\n\n";
 				//displayCurrentPosts();
 			}
 			else cout << "No Posts Found\n\n";
