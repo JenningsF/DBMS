@@ -105,6 +105,7 @@ class Blog {
 			displayPost(index);
 		}
 
+		/*
 		void searchAuthor(string name) {
 			for (int i = 0; i < posts.size(); ++i) {
 				if (posts[i].getAuthor() == name) {
@@ -133,7 +134,6 @@ class Blog {
 			}
 			else cout << "No Posts Found\n\n";
 		}
-		/*
 		void searchTags(string tags) {
 			// Must parse argument for multiple tags
 			for (int i = 0; i < posts.size(); ++i) {
@@ -148,7 +148,6 @@ class Blog {
 			}
 			else cout << "No Posts Found\n\n";
 		}
-		*/
 		void searchDate(string day) {
 			for (int i = 0; i < posts.size(); ++i) {
 				if (posts[i].getDatePosted() == day){
@@ -162,6 +161,7 @@ class Blog {
 			}
 			else cout << "No Posts Found\n\n";
 		}
+		*/
 
 		void SearchSequence() {
 			char option = '0';
@@ -174,13 +174,13 @@ class Blog {
 					cout << "* Enter author: ";
 					cin >> searchFor;
 					cout << endl;
-					searchAuthor(searchFor);
+					//searchAuthor(searchFor);
 					break;
 				case '2':
 					cout << "* Enter title: ";
 					cin >> searchFor;
 					cout << endl;
-					searchTitle(searchFor);
+					//searchTitle(searchFor);
 					break;
 				case '3':
 					cout << "* Enter tags (seperated by commas): ";
@@ -192,7 +192,7 @@ class Blog {
 					cout << "* Enter date: ";
 					cin >> searchFor;
 					cout << endl;
-					searchDate(searchFor);
+					//searchDate(searchFor);
 					break;
 				case '5':
 					break;
