@@ -110,8 +110,11 @@ class Blog {
 				if (posts[i].getAuthor() == name)
 					currentPosts.push_back(posts[i]);
 			}
-			cout << '[' << name << "'s Posts]\n\n";
-			displayCurrentPosts();
+			if (currentPosts.size() > 0) {
+				cout << '[' << name << "'s Posts]\n\n";
+				displayCurrentPosts();
+			}
+			else cout << "No Posts Found\n\n";
 		}
 
 		void searchTitle(string title) {
@@ -120,17 +123,24 @@ class Blog {
 				if (posts[i].getTitle() == title)
 					currentPosts.push_back(posts[i]);
 			}
-			cout << "['" << name << "' Posts]\n\n";
-			displayCurrentPosts();
+			if (currentPosts.size() > 0) {
+				cout << '[' << title << "'s Posts]\n\n";
+				displayCurrentPosts();
+			}
+			else cout << "No Posts Found\n\n";
 		}
 
 		void searchTags(string tags) {
 			// Must parse argument for multiple tags
 			for (int i = 0; i < posts.size(); ++i) {
-				if (posts[i].getTags() == tags)
+				//if (posts[i].getTags() == tags)
 					currentPosts.push_back(posts[i]);
 			}
-			cout << "['" << name << "' Posts]\n\n";
+			if (currentPosts.size() > 0) {
+				cout << '[' << tags << "'s Posts]\n\n";
+				//displayCurrentPosts();
+			}
+			else cout << "No Posts Found\n\n";
 		}
 
 		void searchDate(string day) {
@@ -138,8 +148,11 @@ class Blog {
 				if (posts[i].getDatePosted() == day)
 					currentPosts.push_back(posts[i]);
 			}
-			cout << "['" << name << "' Posts]\n\n";
-			displayCurrentPosts();
+			if (currentPosts.size() > 0) {
+				cout << '[' << day << "'s Posts]\n\n";
+				displayCurrentPosts();
+			}
+			else cout << "No Posts Found\n\n";
 		}
 
 		void SearchSequence() {
