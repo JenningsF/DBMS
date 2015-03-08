@@ -121,13 +121,16 @@ vector<string> Post::getTags() { return tags; }
 // Returns true if the argument tags matches the post's tags
 bool Post::containsTags(vector<string> t) {
 	if (t.size() > tags.size()) return false;
-	for (int i = 0; i < tags.size(); ++i) {
+	vector<bool> allFound;
+	for (int i = 0; i < t.size(); ++i) {
 		bool found = false;
-		for (int j = 0; j < t.size(); ++j) {
-			if (tags[i] == t[j]) found = true;
+		for (int j = 0; j < tags.size(); ++j) {
+			if (tags[j] == t[i]) found = true;
 		}
-		if (found) continue;
-		else return false;
+		allFound.push_back(found);
+	}
+	for (int k = 0; k < allFound.size(); ++k) {
+		if (!allFound[k]) return false;
 	}
 	return true;
 }
