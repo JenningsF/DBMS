@@ -5,6 +5,6 @@ DBengine.o: DBengine.cpp DBengine.h Attributes.h
 Parser.o: Parser.cpp Parser.h Attributes.h
 	g++ -g -c Parser.cpp
 APIdbms.o: APIdbms.cpp APIdbms.h DBengine.h Parser.h
-	g++ -g -c main.cpp
+	g++ -g -c APIdbms.cpp
 clean:
 	rm *.o *.a
