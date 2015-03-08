@@ -470,7 +470,7 @@ int main() {
 	}
 
 	// Command to create sample animals table
-	DBMSParse("CREATE TABLE app (title STRING(20), author STRING(20), date STRING(10), tags STRING(100), content STRING(250), commenting INT(2)) PRIMARY KEY (title, author);");
+	DBMSParse("CREATE TABLE app (title VARCHAR(20), author VARCHAR(20), date VARCHAR(10), tags VARCHAR(100), content VARCHAR(250), commenting INTEGER) PRIMARY KEY (title, author);");
 
 
 	// Initiate Blog App
