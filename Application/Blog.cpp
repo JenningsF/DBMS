@@ -329,6 +329,7 @@ void Blog::MenuSequence() {
 		switch (option) {
 			case '1':
 				cout << "New post selected\n" << endl;
+				newPostSequence()
 				break;
 			case '2':
 				SearchSequence();
