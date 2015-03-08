@@ -447,6 +447,7 @@ bool Blog::login() {
 			break;
 		}
 	}
+	return true;
 }
 
 
