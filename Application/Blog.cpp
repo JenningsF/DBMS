@@ -327,7 +327,12 @@ void Blog::SearchSequence() {
 // Begins main menu of blog application, does not end until Exit option is selected
 void Blog::MenuSequence() {
 	Table tab;
-	
+	if (!openDatabaseFile("app"))
+	{
+		// Command to create a table
+		DBMSParse("CREATE TABLE app (title VARCHAR(20), author VARCHAR(20), date VARCHAR(10), tags VARCHAR(100), content VARCHAR(250), commenting INTEGER) PRIMARY KEY (title, author);");
+	}
+	tab = GetRelation("app");
 	while (!done) {
 		char option = '0';
 		cout << mainMenu << commandPrompt;
@@ -351,7 +356,8 @@ void Blog::MenuSequence() {
 				cout << "Unknown command..\n" << endl;
 				break;
 		}
-	}	
+	}
+	writeDatabaseFile("app");
 }
 
 
@@ -460,39 +466,32 @@ bool Blog::login() {
 
 
 int main() {
-	Blog app;
-	bool done = false;
-	char option = '0';
+	//try{
+		Blog app;
+		bool done = false;
+		char option = '0';
 
-	// User Login / Registering
-	if (!app.login()) {
-		return 0;
-	}
+		// User Login / Registering
+		if (!app.login()) {
+			return 0;
+		}
 
-	// Command to create sample animals table
-	DBMSParse("CREATE TABLE app (title VARCHAR(20), author VARCHAR(20), date VARCHAR(10), tags VARCHAR(100), content VARCHAR(250), commenting INTEGER) PRIMARY KEY (title, author);");
+		// Initiate Blog App
+		app.MenuSequence();
 
+		cout << endl << endl << "**--**   TESTING OTHER TEAM's DBMS   **--**" << endl;
 
-	// Initiate Blog App
-	app.MenuSequence();
+		// Get table from DBMS 
+		Table tab = GetRelation("animals");
 
-	cout << endl << endl << "**--**   TESTING OTHER TEAM's DBMS   **--**" << endl;
-	
-	// Get table from DBMS 
-	Table tab = GetRelation("animals");
-
-	// Insert a row into table
-	vector<string> first = {"Joe", "dog", "41"};
-	tab.addTuple(first);
+		// Insert a row into table
+		vector<string> first = { "Joe", "dog", "41" };
+		tab.addTuple(first);
 
 
-	cout << tab.getTuple(0)[0] << "  " << tab.getTuple(0)[1] << endl;
-	cout << "**--**         TESTING ENDED         **--**" << endl << endl;
-
-	ofstream outfile;
-	outfile.open("credentials.txt");
-	outfile << "";
-	outfile.close();
-
+		cout << tab.getTuple(0)[0] << "  " << tab.getTuple(0)[1] << endl;
+		cout << "**--**         TESTING ENDED         **--**" << endl << endl;
+	//}
+	//catch (...){}
 	return 0;
 }

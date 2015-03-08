@@ -357,7 +357,7 @@ bool openDatabaseFile(string relationName) {
    //each table is held in a file named <relationName>.txt
    ifstream in(relationName + ".txt");
    if(!in.is_open()){
-      throw IONoFile();
+      //throw IONoFile();
       return false;
    }
 
