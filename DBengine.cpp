@@ -488,7 +488,7 @@ void DBengine::insert(string tableName, vector<string> rows) {
 	vector<string> keys = tempTable->keyParameters;
 	vector<attribute> attributes = tempTable->attributes;
 	vector<attribute> rowData = tempTable->attributes;
-	for (int i = 0; i < rows.size(); ++i) {
+	for (int i = 0; i < rows.size(); i++) {
 		rowData[i].entryData = rows[i];
 	}
 	string primaryKey = "";

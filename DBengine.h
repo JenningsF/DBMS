@@ -7,8 +7,8 @@
 // Description	: Database Engine where functions will be declared
 //********************************************************
 
-#ifndef _DBEngine_
-#define _DBEngine_1
+#ifndef DBEngine_H
+#define DBEngine_H
 #include <algorithm>
 #include <cstdlib>
 #include <ctime>

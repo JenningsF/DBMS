@@ -136,7 +136,7 @@ void trimQuote(string& s) {
 	if (s[0] == '"' || s[0] == '\'' || s[0] == ' ') {
 		s = s.substr(1, s.length());
 	}
-	if (s[s.length() - 1] == '"' || s[s.length() - 1] == '\'' || s[s.length() - 1] == ' ') {
+	if (s[s.length() - 1] == '\"' || s[s.length() - 1] == '\'' || s[s.length() - 1] == ' ') {
 		s = s.substr(0, s.length() - 1);
 	}
 }
@@ -278,7 +278,7 @@ void Parser::parse_query() {
 //Parser:: parse_create(string l)
 
 void convertType(string &type) {
-	if(type == "VARCHAR" || type == "varchar") {
+	if (type == "VARCHAR" || type == "varchar" || type == "STRING" || type == "string") {
 		type = "string";
 	}
 	else if(type == "INTEGER" || type == "integer") {
@@ -437,14 +437,16 @@ void Parser::parse_insert() {
 	if (expr != "RELATION") {
 		//need to get attributes of relation_name
 		line.erase(0, line.find('(') + 1);	// Joe, cat, 4);
-		line.erase(line.find(')'), line.find(';') + 1);
-		line += " ";
 		while (line.size() > 0) {
-			size_t p = line.find(',');
-			dataVal = line.substr(0, line.find(','));
+			size_t p1 = line.find('\"');
+			size_t p2 = line.find(',');
+			size_t p3 = line.find(')');
+			if (p3 < p2) { p2 = p3; }
+			if (p3 == string::npos) { break; }
+			dataVal = line.substr(p1, p2 - 1);
 			trimQuote(dataVal);
 			elem.attributes.push_back(dataVal);
-			line.erase(0, line.find(' ') + 1);
+			line.erase(p1, p2 + 1);
 		}
 	}
 	else {	//needs to parse expr

@@ -18,9 +18,6 @@ private:
 	string fromName;
 	string_command command;
 	vector<element> query;
-	/*Parameters used for queries and commands*/
-	
-	/*Parameters used for commands*/
 	
 public:
 	Parser();
