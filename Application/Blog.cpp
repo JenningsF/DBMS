@@ -328,11 +328,9 @@ void Blog::SearchSequence() {
 // Begins main menu of blog application, does not end until Exit option is selected
 void Blog::MenuSequence() {
 	Table tab;
-	if (!openDatabaseFile("app"))
-	{
-		// Command to create a table
-		DBMSParse("CREATE TABLE app (title VARCHAR(20), author VARCHAR(20), date VARCHAR(10), tags VARCHAR(100), content VARCHAR(250), commenting INTEGER) PRIMARY KEY (title, author);");
-	}
+	// Command to create a table
+	//DBMSParse("CREATE TABLE app (title VARCHAR(20), author VARCHAR(20), date VARCHAR(10), tags VARCHAR(100), content VARCHAR(250), commenting INTEGER) PRIMARY KEY (title, author);");
+	
 	tab = GetRelation("app");
 	while (!done) {
 		char option = '0';
@@ -358,7 +356,6 @@ void Blog::MenuSequence() {
 				break;
 		}
 	}
-	writeDatabaseFile("app");
 }
 
 
