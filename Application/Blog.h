@@ -5,6 +5,7 @@
 #include <limits>
 #include <fstream>
 #include <climits>
+#include <time.h>
 
 using namespace std;
 
@@ -51,8 +52,8 @@ class Blog {
 		string author;
 		bool done;
 		bool done2;
-		vector<Post> posts;
 		vector<Post> currentPosts;
+		vector<Post> posts;
 	public:
 		Blog();
 

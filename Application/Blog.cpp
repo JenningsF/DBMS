@@ -1,5 +1,8 @@
+#define _CRT_SECURE_NO_WARNINGS
+
 #include "DbmsApi.h"
 #include "Blog.h"
+#include "handler.h"
 
 using namespace std;
 
@@ -272,6 +275,8 @@ void Blog::newPostSequence() {
 	currentDate.insert(6, "/");
 	newPost.setDate(currentDate);
 
+
+
 	posts.push_back(newPost);
 
 	cout << "\nPost succesfully made!\n\n";
@@ -321,6 +326,8 @@ void Blog::SearchSequence() {
 
 // Begins main menu of blog application, does not end until Exit option is selected
 void Blog::MenuSequence() {
+	Table tab;
+	
 	while (!done) {
 		char option = '0';
 		cout << mainMenu << commandPrompt;
@@ -329,7 +336,7 @@ void Blog::MenuSequence() {
 		switch (option) {
 			case '1':
 				cout << "New post selected\n" << endl;
-				newPostSequence()
+				newPostSequence();
 				break;
 			case '2':
 				SearchSequence();
@@ -462,13 +469,15 @@ int main() {
 		return 0;
 	}
 
+	// Command to create sample animals table
+	DBMSParse("CREATE TABLE app (title STRING(20), author STRING(20), date STRING(10), tags STRING(100), content STRING(250), commenting INT(2)) PRIMARY KEY (title, author);");
+
+
 	// Initiate Blog App
 	app.MenuSequence();
 
 	cout << endl << endl << "**--**   TESTING OTHER TEAM's DBMS   **--**" << endl;
-	// Command to create sample animals table
-	DBMSParse("CREATE TABLE animals (name VARCHAR(20), kind VARCHAR(8), years INTEGER) PRIMARY KEY (name, kind);");
-
+	
 	// Get table from DBMS 
 	Table tab = GetRelation("animals");
 
@@ -479,6 +488,11 @@ int main() {
 
 	cout << tab.getTuple(0)[0] << "  " << tab.getTuple(0)[1] << endl;
 	cout << "**--**         TESTING ENDED         **--**" << endl << endl;
+
+	ofstream outfile;
+	outfile.open("credentials.txt");
+	outfile << "";
+	outfile.close();
 
 	return 0;
 }
