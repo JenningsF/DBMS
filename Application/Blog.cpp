@@ -2,7 +2,6 @@
 
 #include "DbmsApi.h"
 #include "Blog.h"
-#include "handler.h"
 
 using namespace std;
 
