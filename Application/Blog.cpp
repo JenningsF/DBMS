@@ -468,32 +468,16 @@ bool Blog::login() {
 
 
 int main() {
-	//try{
-		Blog app;
-		bool done = false;
-		char option = '0';
+	Blog app;
+	bool done = false;
+	char option = '0';
 
-		// User Login / Registering
-		if (!app.login()) {
-			return 0;
-		}
+	// User Login / Registering
+	if (!app.login()) {
+		return 0;
+	}
 
-		// Initiate Blog App
-		app.MenuSequence();
-
-		cout << endl << endl << "**--**   TESTING OTHER TEAM's DBMS   **--**" << endl;
-
-		// Get table from DBMS 
-		//Table tab = GetRelation("animals");
-
-		// Insert a row into table
-		//vector<string> first = { "Joe", "dog", "41" };
-		//tab.addTuple(first);
-
-
-		//cout << tab.getTuple(0)[0] << "  " << tab.getTuple(0)[1] << endl;
-		cout << "**--**         TESTING ENDED         **--**" << endl << endl;
-	//}
-	//catch (...){}
+	// Initiate Blog App
+	app.MenuSequence();
 	return 0;
 }

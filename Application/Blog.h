@@ -73,7 +73,7 @@ class Blog {
 		void searchDate(string day);
 
 		// Sequence functions
-		void newPostSequence(int parent);
+		void newPostSequence();
 		void SearchSequence();
 		void MenuSequence();
 
