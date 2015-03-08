@@ -59,7 +59,11 @@ Blog::Blog() {
     searchMenu = "[Search Menu]\n\nSearch by:\n1. Author\n2. Title\n3. Tag(s)\n4. Date\n5. Return to Main Menu\n\n";
     postMenu = "1. View\n2. Edit\n3. Delete\n4. Comment\n5. Return to Main Menu\n\n";
 	commandPrompt = "* Enter command: ";
+	loginPrompt = "[Login / Register]\n\n1. Login\n2. Register\n3. Exit\n\n";
+	loginSequence = "[Login]\n\n";
+	registerSequence = "[Register]\n\n";
 	done = false;	
+	done2 = false;
 }
 
 // This function displays the post menu, allowing for a selection of 
@@ -270,13 +274,118 @@ void Blog::MenuSequence() {
 }
 
 
+bool Blog::LoginSequence() {
+	string name = "";
+	string first_name;
+	string last_name;
+	cout << loginSequence << "* First Name: ";
+	cin >> first_name;
+	cout << "* Last Name: ";
+	cin >> last_name;
+	cout << endl;
+	name = first_name + " " + last_name;
+	string u_name;
+	string line = "";
+	ifstream infile;
+	infile.open("credentials.txt");
+	if (!infile.is_open())
+	{
+		cout << "+ Error: credentials file was not opened properly\n" << endl;
+		return false;
+	}
+	while (getline(infile, line)) {
+		if (line.empty()) { continue; }
+		if (name == line) {
+			infile.close();
+			author = name;
+			return true;
+		}
+	}
+	infile.close();
+	cout << "+ Name not found\n" << endl;
+	return false;
+}
 
+bool Blog::RegisterSequence() {
+	cout << registerSequence;
+	bool isDone = false;
+	string name = "";
+	string first_name;
+	string last_name;
+	cout << "* First Name: ";
+	cin >> first_name;
+	cout << "* Last Name: ";
+	cin >> last_name;
+	cout << endl;
+	name = first_name + " " + last_name;
+	string line = "";
+	ifstream infile;
+	infile.open("credentials.txt");
+	if (!infile.is_open())
+	{
+		cout << "+ Error: credentials file was not opened properly\n" << endl;
+		return false;
+	}
+	while (!infile.eof()) {
+		getline(infile, line);
+		if (line.empty()) { continue; }
+		if (name == line) {
+			infile.close();
+			cout << "+ Name already registered\n" << endl;
+			return false;
+		}
+	}
+	infile.close();
+	ofstream outfile;
+	outfile.open("credentials.txt", std::ofstream::out | std::ofstream::app);
+	if (!outfile.is_open())
+	{
+		cout << "Error: credentials file was not opened properly\n" << endl;
+		return false;
+	}
+	outfile << endl << name;
+	outfile.close();
+	return true;
+}
+
+bool Blog::login() {
+	while (!done2) {
+		char option = '0';
+		cout << loginPrompt << commandPrompt;
+		cin >> option;
+		cout << endl;
+		switch (option) {
+		case '1':
+			if (LoginSequence()) {
+				done2 = true;
+			}
+			break;
+		case '2':
+			RegisterSequence();
+			break;
+		case '3':
+			cout << "Exit selected\n" << endl;
+			return false;
+			break;
+		default:
+			cin.clear();
+			cin.ignore(numeric_limits<streamsize>::max(), '\n');
+			cout << "Unknown command..\n" << endl;
+			break;
+		}
+	}
+}
 
 
 int main() {
 	Blog app;
 	bool done = false;
 	char option = '0';
+
+	// User Login / Registering
+	if (!app.login()) {
+		return 0;
+	}
 
 	// Initiate Blog App
 	app.MenuSequence();

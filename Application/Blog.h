@@ -2,7 +2,7 @@
 #include <vector>
 #include <iostream>
 #include <limits>
-
+#include <fstream>
 
 using namespace std;
 
@@ -44,11 +44,21 @@ class Blog {
 		string searchMenu;
 		string commandPrompt;
 		string postMenu;
+		string loginPrompt;
+		string loginSequence;
+		string registerSequence;
+		string author;
 		bool done;
+		bool done2;
 		vector<Post> posts;
 		vector<Post> currentPosts;
 	public:
 		Blog();
+
+		// Login functions
+		bool login();
+		bool LoginSequence();
+		bool RegisterSequence();
 
 		// Result functions
 		void displayPost(int p);
