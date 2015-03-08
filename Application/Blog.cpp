@@ -72,12 +72,12 @@ Blog::Blog() {
 // view, edit, delete or comment. This function needs it's implementation finished
 void Blog::displayPost(int p) {
 	char option = '0';
-	if (p < 0 || p >= currentPosts.size()) {
+	if (p <= 0 || p > currentPosts.size()) {
 		cout << "\n\n--INCORRECT SELECTION--\n\n";
 		return;
 	}
 	else {
-		cout << '[' << currentPosts[p].getTitle() << "]\n\n" << postMenu << commandPrompt;
+		cout << '[' << currentPosts[p-1].getTitle() << "]\n\n" << postMenu << commandPrompt;
 		cin >> option;
 		cout << endl;
 		switch (option) {
@@ -91,7 +91,8 @@ void Blog::displayPost(int p) {
 				cout << "\n\nDelete option selected\n\n";
 				break;
 			case '4':
-				cout << "\n\nComment option selected\n\n";
+				cout << "\n\nComment option selected\n";
+				newPostSequence(currentPosts[p-1].getPostID());
 				break;
 			case '5':
 				break;
@@ -109,7 +110,7 @@ void Blog::displayPost(int p) {
 void Blog::displayCurrentPosts() {	
 	int index = -1;		
 	for (int i = 1; i <= currentPosts.size(); ++i) {
-		cout << i << ". " << currentPosts[i-1].getTitle() << " (" << currentPosts[i-1].getDatePosted() << ")\n";
+		cout << i << ". " << currentPosts[i-1].getTitle() << " (" << currentPosts[i-1].getDatePosted() << ")" << endl;
 	}
 	cout << currentPosts.size() + 1 << ". Return to Main Menu\n\n";
 	cout << "* Enter ID: ";
@@ -207,11 +208,11 @@ void Blog::searchDate(string day) {
 }
 
 // Sequence containing insert menu
-void Blog::newPostSequence() {
+void Blog::newPostSequence(int parent = -1) {
 	Post newPost;
 	string postTitle, postContent, line, tag, commenting;
 	vector<string> tagList;
-	
+	newPost.setParentID(parent);
 	newPost.setAuthor(author);
 	cout << "* Enter Title: ";
 	cin >> postTitle;
@@ -264,6 +265,7 @@ void Blog::newPostSequence() {
 	time_t rawtime;
 	time(&rawtime);
 	string currentDate = ctime(&rawtime);
+	currentDate.erase(currentDate.find("\n"), currentDate.find("\n") + 1);
 	currentDate.erase(0, 4);
 	currentDate.insert(3, "/");
 	if (currentDate[4] == ' ') {
@@ -482,14 +484,14 @@ int main() {
 		cout << endl << endl << "**--**   TESTING OTHER TEAM's DBMS   **--**" << endl;
 
 		// Get table from DBMS 
-		Table tab = GetRelation("animals");
+		//Table tab = GetRelation("animals");
 
 		// Insert a row into table
-		vector<string> first = { "Joe", "dog", "41" };
-		tab.addTuple(first);
+		//vector<string> first = { "Joe", "dog", "41" };
+		//tab.addTuple(first);
 
 
-		cout << tab.getTuple(0)[0] << "  " << tab.getTuple(0)[1] << endl;
+		//cout << tab.getTuple(0)[0] << "  " << tab.getTuple(0)[1] << endl;
 		cout << "**--**         TESTING ENDED         **--**" << endl << endl;
 	//}
 	//catch (...){}
