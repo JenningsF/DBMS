@@ -1,8 +1,10 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <sstream>
 #include <limits>
 #include <fstream>
+#include <climits>
 
 using namespace std;
 
@@ -17,7 +19,6 @@ class Post {
 		int postId;
 		int parentId;
 	public:
-		Post();
 		Post(const Post& p);
 		Post(string ti, string au, string co,  string day, bool allow, int post, int parent);
 		void setTitle(string ti);
@@ -71,6 +72,7 @@ class Blog {
 		void searchDate(string day);
 
 		// Sequence functions
+		void newPostSequence();
 		void SearchSequence();
 		void MenuSequence();
 

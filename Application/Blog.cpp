@@ -9,7 +9,6 @@ using namespace std;
 */
 
 // Constructors
-Post::Post() : title(""), author(""), content(""), allowComments(false), date(""), postId(-1), parentId(-1) {}
 Post::Post(const Post& p) {
 	title = p.title;
 	author = p.author;
@@ -151,7 +150,7 @@ void Blog::searchTitle(string title) {
 		}
 	}
 	if (currentPosts.size() > 0) {
-		cout << '[' << title << "'s Posts]\n\n";
+		cout << "[Posts with '" << title << "' as a Title]\n\n";
 		displayCurrentPosts();
 	}
 	else {
@@ -174,7 +173,7 @@ void Blog::searchTags(string tag) {
 		}
 	}
 	if (currentPosts.size() > 0) {
-		cout << '[' << tag << "'s Posts]\n\n";
+		cout << "[Posts with " << tag << " as a Tag]\n\n";
 		//displayCurrentPosts();
 	}
 	else  {
@@ -194,7 +193,7 @@ void Blog::searchDate(string day) {
 		}
 	}
 	if (currentPosts.size() > 0) {
-		cout << '[' << day << "'s Posts]\n\n";
+		cout << "[Posts made on " << day << "]\n\n";
 		displayCurrentPosts();
 	}
 	else  {
@@ -202,6 +201,80 @@ void Blog::searchDate(string day) {
 		cin.ignore(numeric_limits<streamsize>::max(), '\n');
 		cout << "No Posts Found\n\n";
 	}
+}
+
+// Sequence containing insert menu
+void Blog::newPostSequence() {
+	Post newPost;
+	string postTitle, postContent, line, tag, commenting;
+	vector<string> tagList;
+	
+	newPost.setAuthor(author);
+	cout << "* Enter Title: ";
+	cin >> postTitle;
+	cout << endl;
+	newPost.setTitle(postTitle);
+	cout << "* Enter Post Content: ";
+	cin >> postContent;
+	cout << endl;
+	newPost.setContent(postContent);
+	cout << "* Enter Tag(s):\n";
+	cout << "Enter DONE when finished entering tags" << endl;
+	// while loop to get all tags
+	while (getline(cin, line)) {
+		istringstream iss(line);
+		iss >> tag;
+		if (tag == "DONE"){
+			break;
+		}
+		else tagList.push_back(tag);
+	}
+	tagList.erase(tagList.begin());	// Deletes empty first index
+	newPost.setTags(tagList);
+	cout << endl;
+	
+	cout << "* Would you like commenting? (yes/no): ";
+	cin >> commenting;
+	// Checks if input is valid and asks for valid answer if it is not
+	bool goodAnswer = false;
+	while (!goodAnswer) {
+		if (commenting == "yes" || commenting == "Yes" || commenting == "y" || commenting == "Y") {
+			newPost.setCommenting(true);
+			goodAnswer = true;
+		}
+		else if (commenting == "no" || commenting == "No" || commenting == "n" || commenting == "N") {
+			newPost.setCommenting(false);
+			goodAnswer = true;
+		}
+		else {
+			cout << "Please enter a valid answer (yes/no): ";
+			cin >> commenting;
+		}
+	}
+
+	if (posts.empty()) {
+		newPost.setPostID(1);
+	}
+	else newPost.setPostID(posts.back().getPostID() + 1);
+
+	// Gets current system date, parses it, and sets as post date
+	time_t rawtime;
+	time(&rawtime);
+	string currentDate = ctime(&rawtime);
+	currentDate.erase(0, 4);
+	currentDate.insert(3, "/");
+	if (currentDate[4] == ' ') {
+		currentDate.erase(4, 2);
+		currentDate.insert(4, "0");
+	}
+	else currentDate.erase(4, 1);
+	currentDate.erase(6, 10);
+	currentDate.insert(6, "/");
+	newPost.setDate(currentDate);
+
+	posts.push_back(newPost);
+
+	cout << "\nPost succesfully made!\n\n";
 }
 
 // Sequence containing search menu
