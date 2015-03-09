@@ -502,7 +502,6 @@ void Blog::newPostSequence(int parent = -1) {
 		cout << "* Enter Comment Content: ";
 	}
 	newPost.setTitle(postTitle);
-	cin.ignore();
 	getline(cin, postContent);
 	cout << endl;
 	newPost.setContent(postContent);
