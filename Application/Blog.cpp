@@ -45,7 +45,6 @@ vector<string> getInputTags() {
 			tagList.push_back(tag);
 		}
 	}
-	tagList.erase(tagList.begin());
 	tagList.push_back(tags);
 	return tagList;
 }
