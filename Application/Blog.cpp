@@ -225,7 +225,7 @@ void Blog::editPost(int p) {
 		else cout << "\n\nAn error occured when changing author!\n\n";
 		break;
 	case '3':
-		cout << "\n\n* Current content: " + currentPosts[p - 1].getContent() + "\n"
+		cout << "\n\n* Current content: " + currentPosts[curIndex].getContent() + "\n"
 			<< "* Enter new content: ";
 		getline(cin, newData);
 		currentPosts[curIndex].setContent(newData);
