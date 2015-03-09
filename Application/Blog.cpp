@@ -320,8 +320,13 @@ void Blog::displayPostMenu(int p) {
 				deletePost(currentPosts[p-1].getPostID());
 				break;
 			case '4':
-				cout << "\n\nComment option selected\n";
-				newPostSequence(currentPosts[p-1].getPostID());
+				if (currentPosts[p-1].getCommenting()) {
+					cout << "\n\nComment option selected\n";
+					newPostSequence(currentPosts[p-1].getPostID());
+				}
+				else {
+					cout << "\n\nComments disabled for this post.\n\n";
+				}
 				break;
 			case '5':
 				break;
