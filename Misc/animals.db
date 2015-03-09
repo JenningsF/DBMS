@@ -1,0 +1,8 @@
+name string 20 , kind string 8 , age int , key name kind 
+Joe /,/ cat /,/ 4 /,/ Joecat 
+Spot /,/ dog /,/ 10 /,/ Spotdog
+Snoopy /,/ bird /,/ 3 /,/ Snoopybird
+Tweety /,/ bird /,/ 1 /,/ Tweetybird
+Joe /,/ bird /,/ 2 /,/ Joebird
+Joe /,/ cat /,/ 4 /,/ Joecat
+
