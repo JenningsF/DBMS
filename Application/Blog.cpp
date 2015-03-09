@@ -311,6 +311,7 @@ void Blog::displayPostMenu(int p) {
 		switch (option) {
 			case '1':
 				cout << "\n\nView option selected\n\n";
+				printPost(currentPosts[p-1]);
 				break;
 			case '2':
 				cout << "\n\nEdit option selected\n\n";
@@ -354,6 +355,45 @@ void Blog::displayCurrentPosts() {
 	// Calls display on selected post if they did not choose to return to menu
 	if (index != currentPosts.size() + 1)
 		displayPostMenu(index);
+}
+
+// Prints out Post and Comments attached to that Post
+void Blog::printPost(Post post) {
+	cout << "\n--------------------------------------------------------------------------------" << endl;
+	cout << "By: " << post.getAuthor() << endl;
+	cout << "Date: " << post.getDatePosted() << endl;
+	cout << "\n" << post.getTitle() << endl;
+	cout << post.getContent() << endl;
+	vector<string> postTags = post.getTags();
+	cout << "\nTags: ";
+	for (int i = 0; i < postTags.size(); ++i) {
+		cout << postTags[i];
+		if (i != postTags.size() - 1) {
+			cout << ", ";
+		}
+	}
+	cout << "\n\nComments:\n";
+	printComments(post.getPostID());
+
+	cout << "\n--------------------------------------------------------------------------------" << endl;
+}
+
+// Helper function used to print comments
+void Blog::printComments(int parentId) {
+	vector<Post> commentList;
+	Post currentComment;
+	for (int i = 0; i < posts.size(); ++i) {
+		if (posts[i].getParentID() == parentId)
+			commentList.push_back(posts[i]);
+	}
+	if (commentList.empty())
+		cout << "No Comments Available." << endl;
+	for (int j = 0; j < commentList.size(); ++j) {
+		currentComment = commentList[j];
+		cout << j + 1 << ".\tOn " << currentComment.getDatePosted() << ", "
+				<< currentComment.getAuthor() << " said:" << endl;
+		cout << "\t\t\t" << currentComment.getContent() << "\n\n";
+	}
 }
 
 // Searches for posts that has a matching author

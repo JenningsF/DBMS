@@ -71,7 +71,9 @@ class Blog {
 		void searchDate(string day);
 		// Result functions
 		void displayPostMenu(int p);
-		void displayCurrentPosts();	
+		void displayCurrentPosts();
+		void printPost(Post post);
+		void printComments(int parentId);
 		// Sequence functions
 		void newPostSequence(int parent);
 		bool LoginSequence();
