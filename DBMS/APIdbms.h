@@ -13,18 +13,18 @@
 
 /*
 	Parses input string
-	Input: Reference to DB, String to be parsed
-	Output: bool value for commands such as OPEN to signal a successful completion
+	Input: Reference to DB, String
+	Output: None
 */
 bool parse_db(DBengine &db, string parse_string);
 /*
-	Input: Reference to DB Engine, filename
+	Input: filename
 	Output: returns the relation/table
 */
 Relation* getTable_db(DBengine &db, string fromName);
 /*
 	Used to check whether a database exists
-	Input: Reference to DB Engine, filename
+	Input: filename
 */
 bool tableExists_db(DBengine &db, string tableName);
 #endif
