@@ -1,6 +1,0 @@
-name string 20 , kind string 8 , age int , key name kind 
-Gokul /,/ cat /,/ 4 /,/ Joecat 
-Tom /,/ honeybadger /,/ 10 /,/ Spotdog
-Quinten /,/ ducky /,/ 5 /,/ Snoopybird
-Jennings /,/ petri /,/ 11 /,/ Tweetybird
-Cody /,/ eagle /,/ 20 /,/ Joebird
