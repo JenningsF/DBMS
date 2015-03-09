@@ -261,7 +261,7 @@ void Blog::editPost(int p) {
 		else newData = "0";
 		currentPosts[curIndex].setCommenting(commenting);
 		posts[index].setCommenting(commenting);
-		if (DBMSParse("UPDATE app SET commenting=" + newData + " WHERE (id == " + to_string(p) + ");"))
+		if (DBMSParse("UPDATE app SET commenting=\"" + newData + "\" WHERE (id == " + to_string(p) + ");"))
 			cout << "\n\nCommenting changed successfully.\n\n";
 		else cout << "\n\nAn error occured when changing commenting!\n\n";
 		break;
