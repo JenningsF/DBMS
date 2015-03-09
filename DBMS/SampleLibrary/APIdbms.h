@@ -7,7 +7,7 @@
 // Description	: Database Engine where functions will be declared
 //********************************************************
 #ifndef APIDBMS_H
-#define APIDBMS_H 1
+#define APIDBMS_H
 
 #include "DBengine.h"
 

@@ -269,20 +269,16 @@ string Row::get(string colName) {
 string Row::getPK() { return PK; }
 
 // Sets column data
-template <typename T>
-bool Row::set(string colName, T data) {
+bool Row::set(string colName, string data) {
 	int index = findIndex(colName);
 	// Ensures columnName and columns vectors are same size
 	if (columns.size() > index && index != -1) {
-		stringstream buffer;
-		// Make data a string for storing
-		buffer << data;
 		// Ensure it complies with data size spec.
 		if (table->attributes[index].attributeType == "string" &&
-			table->attributes[index].attributeSize < buffer.str().size())
+			table->attributes[index].attributeSize < data.length())
 			return false;
 
-		columns[index] = buffer.str();
+		columns[index] = data;
 	}
 	else return false;
 
@@ -927,9 +923,9 @@ istream& operator>>(istream& in, Relation& table) {
 			if (attribs[i].attributeType == "string" || attribs[i].attributeType == "key")
 				rows[rows.size() - 1].set(attribs[i].attributeName, tempData[i]);
 			else if (attribs[i].attributeType == "int")
-				rows[rows.size() - 1].set(attribs[i].attributeName, atoi(tempData[i].c_str()));
+				rows[rows.size() - 1].set(attribs[i].attributeName, tempData[i]);
 			else if (attribs[i].attributeType == "double")
-				rows[rows.size() - 1].set(attribs[i].attributeName, atof(tempData[i].c_str()));
+				rows[rows.size() - 1].set(attribs[i].attributeName, tempData[i]);
 		}
 		tempData.clear();
 	}

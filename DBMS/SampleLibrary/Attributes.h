@@ -21,8 +21,6 @@ class DataNotFound{};
 //move to new header file
 enum string_command{eOpen, eClose, eInsert, eCreate, eWrite, eExit, eUpdate, eRename, eProject, eDelete, eShow, eSelect, eUnion, eDiff, eCross, ERROR = 100};
 string_command hashit(string const& inString);
-enum string_type{eChar, eInt};
-string_type hashtype(string const& inString);
 
 // Attribute struct to hold column properties
 struct attribute {
@@ -65,10 +63,15 @@ struct element {
 	string fromName;
 	string_command command;
 	string query_type;
-	string column;
-	string value;
+	vector<string> column; 
+	vector<string> value;
+	vector<string> condition_one;
+	vector<string> comparisons;
+	vector<string> condition_two;
 	vector<string> attributes;
 	vector<attribute> attribs;
+	vector<attribute> tableAttribs;
+	vector<string> tableAttributes;
 };
 
 #endif

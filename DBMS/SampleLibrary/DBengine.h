@@ -8,7 +8,7 @@
 //********************************************************
 
 #ifndef DBEngine_H
-#define DBEngine_H 1
+#define DBEngine_H
 #include <algorithm>
 #include <cstdlib>
 #include <ctime>
@@ -90,8 +90,7 @@ class Row {
 		// Get Primary Key
 		string getPK();
 		// Sets column data
-		template <typename T>
-		bool set(string colName, T data);
+		bool set(string colName, string data);
 		template <typename T>
 		void set(int colIndex, T data);
 		void setTable(Relation* t);

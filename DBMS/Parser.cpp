@@ -399,7 +399,7 @@ void Parser::parse_update() {
 		line.erase(0, pos);
 	}
 	//WHERE something == LSLS
-	line.erase(0,line.find(' ') + 1);
+	while (line[0] == '(' || line[0] == ' ') { line.erase(0, 1); }
 	while(true)
 	{
 		pos = line.find(' ');
@@ -438,7 +438,8 @@ void Parser::parse_insert() {
 		//need to get attributes of relation_name
 		line.erase(0, line.find('(') + 1);	// Joe, cat, 4);
 		while (line.size() > 0) {
-			size_t p1 = line.find('\"');
+			size_t p1 = line.find('"');
+			if (p1 == string::npos) p1 = line.find(" ");
 			size_t p2 = line.find(',');
 			size_t p3 = line.find(')');
 			if (p3 < p2) { p2 = p3; }
