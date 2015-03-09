@@ -62,6 +62,7 @@ bool enableCommenting(string commenting) {
 		else {
 			cout << "Please enter a valid answer (yes/no): ";
 			cin >> commenting;
+			cin.ignore();
 		}
 	}
 }
@@ -200,12 +201,12 @@ void Blog::editPost(int p) {
 	vector<string> newTags;
 	cout << "\n[" << currentPosts[curIndex].getTitle() << "'s " << editMenu << commandPrompt;
 	cin >> option;
+	cin.ignore();
 	cout << endl;
 	switch (option) {
 	case '1':
 		cout << "\n\n* Current title: " + currentPosts[curIndex].getTitle() + "\n"
 			<< "* Enter new title: ";
-		cin.ignore();
 		getline(cin, newData);
 		currentPosts[curIndex].setTitle(newData);
 		posts[index].setTitle(newData);
@@ -216,7 +217,6 @@ void Blog::editPost(int p) {
 	case '2':
 		cout << "\n\n* Current author: " + currentPosts[curIndex].getAuthor() + "\n"
 			<< "* Enter new author: ";
-		cin.ignore();
 		getline(cin, newData);
 		currentPosts[curIndex].setAuthor(newData);
 		posts[index].setAuthor(newData);
@@ -227,7 +227,6 @@ void Blog::editPost(int p) {
 	case '3':
 		cout << "\n\n* Current content: " + currentPosts[p - 1].getContent() + "\n"
 			<< "* Enter new content: ";
-		cin.ignore();
 		getline(cin, newData);
 		currentPosts[curIndex].setContent(newData);
 		posts[index].setContent(newData);
@@ -256,7 +255,6 @@ void Blog::editPost(int p) {
 		if (currentPosts[curIndex].getCommenting()) cout << "yes\n";
 		else cout << "no\n";
 		cout << "* Would you like to allow commenting? (yes/no): ";
-		cin.ignore();
 		getline(cin, newData);
 		commenting = enableCommenting(newData);
 		if (commenting) newData = "1";
@@ -306,6 +304,7 @@ void Blog::displayPostMenu(int p) {
 	else {
 		cout << "\n[" << currentPosts[p-1].getTitle() << "]\n\n" << postMenu << commandPrompt;
 		cin >> option;
+		cin.ignore();
 		cout << endl;
 		switch (option) {
 			case '1':
@@ -344,7 +343,7 @@ void Blog::displayCurrentPosts() {
 	}
 	cout << currentPosts.size() + 1 << ". Return to Main Menu\n\n";
 	cout << "* Enter ID: ";
-	if (cin >> index);  
+	if (cin >> index) {cin.ignore();}  
 	else {
 		cin.clear(); 
 		cin.ignore(numeric_limits<streamsize>::max(), '\n');
@@ -492,7 +491,6 @@ void Blog::newPostSequence(int parent = -1) {
 	newPost.setAuthor(author);
 	if (parent == -1) {
 		cout << "* Enter Title: ";
-		cin.ignore();
 		getline(cin, postTitle);
 		cout << endl;
 		cout << "* Enter Post Content: ";
@@ -514,6 +512,7 @@ void Blog::newPostSequence(int parent = -1) {
 	if (parent == -1) {
 		cout << "* Would you like to allow commenting? (yes/no): ";
 		cin >> commenting;
+		cin.ignore();
 	}
 	else commenting = "no";
 	if (enableCommenting(commenting)) {
@@ -568,25 +567,23 @@ void Blog::SearchSequence() {
 	string searchFor = "";
 	cout << searchMenu << commandPrompt;
 	cin >> option;
+	cin.ignore();
 	cout << endl;
 	switch (option) {
 		case '1':
 			cout << "* Enter author: ";
-			cin.ignore();
 			getline(cin, searchFor);
 			cout << endl;
 			searchAuthor(searchFor);
 			break;
 		case '2':
 			cout << "* Enter title: ";
-			cin.ignore();
 			getline(cin, searchFor);
 			cout << endl;
 			searchTitle(searchFor);
 			break;
 		case '3':
 			cout << "* Enter tags (seperated by commas): ";
-			cin.ignore();
 			getline(cin, searchFor);
 			cout << endl;
 			searchTags(searchFor);
@@ -594,6 +591,7 @@ void Blog::SearchSequence() {
 		case '4':
 			cout << "* Enter date: ";
 			cin >> searchFor;
+			cin.ignore();
 			cout << endl;
 			searchDate(searchFor);
 			break;
@@ -621,6 +619,7 @@ void Blog::MenuSequence() {
 		char option = '0';
 		cout << mainMenu << commandPrompt;
 		cin >> option;
+		cin.ignore();
 		cout << endl;
 		switch (option) {
 			case '1': // Create a New Post
@@ -651,8 +650,10 @@ bool Blog::LoginSequence() {
 	string last_name;
 	cout << loginSequence << "* First Name: ";
 	cin >> first_name;
+	cin.ignore();
 	cout << "* Last Name: ";
 	cin >> last_name;
+	cin.ignore();
 	cout << endl;
 	name = first_name + " " + last_name;
 	string u_name;
@@ -685,8 +686,10 @@ bool Blog::RegisterSequence() {
 	string last_name;
 	cout << "* First Name: ";
 	cin >> first_name;
+	cin.ignore();
 	cout << "* Last Name: ";
 	cin >> last_name;
+	cin.ignore();
 	cout << endl;
 	name = first_name + " " + last_name;
 	string line = "";
@@ -724,6 +727,7 @@ bool Blog::login() {
 		char option = '0';
 		cout << loginPrompt << commandPrompt;
 		cin >> option;
+		cin.ignore();
 		cout << endl;
 		switch (option) {
 		case '1':
